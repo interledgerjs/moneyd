@@ -1,9 +1,8 @@
-const argv = require('yargs').argv
 const parentBtpHmacKey = 'parent_btp_uri'
-const PARENT_BTP_HOST = argv.parent
-const XRP_SECRET = argv.secret
-const XRP_ADDRESS = argv.address
-const XRP_SERVER = argv['xrp-server'] || 'wss://s1.ripple.com'
+const PARENT_BTP_HOST = process.env.PARENT_BTP_HOST
+const XRP_SECRET = process.env.XRP_SECRET
+const XRP_ADDRESS = process.env.XRP_ADDRESS
+const XRP_SERVER = process.env.XRP_SERVER || 'wss://s1.ripple.com'
 
 if (!PARENT_BTP_HOST || !XRP_SECRET) {
   console.error('--parent and --secret must be defined')
