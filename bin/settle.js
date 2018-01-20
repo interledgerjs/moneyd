@@ -25,6 +25,7 @@ const Plugin = require('ilp-plugin-xrp-asym-client')
 const plugin = new Plugin({
   server: parentUri,
   secret: XRP_SECRET,
+  address: XRP_ADDRESS,
   xrpServer: XRP_SERVER
 })
 

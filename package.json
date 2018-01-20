@@ -1,10 +1,11 @@
 {
   "name": "moneyd",
   "version": "1.0.0",
-  "description": "",
+  "description": "ILP provider using XRP payment channels",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -13,10 +14,17 @@
     "ilp-plugin-mini-accounts": "^3.0.0",
     "ilp-plugin-xrp-asym-client": "^1.0.0",
     "ilp-store-memory": "^1.0.0",
-    "pm2": "^2.9.1",
     "yargs": "^10.1.1"
   },
   "bin": {
     "moneyd": "./bin/index.js"
+  },
+  "devDependencies": {
+    "eslint": "^4.16.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
   }
 }
