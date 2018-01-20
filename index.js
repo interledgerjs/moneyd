@@ -1,3 +1,15 @@
+const argv = require('yargs').argv
+const parentBtpHmacKey = 'parent_btp_uri'
+const PARENT_BTP_HOST = argv.parent
+const XRP_SECRET = argv.secret
+const XRP_ADDRESS = argv.address
+const XRP_SERVER = argv['xrp-server'] || 'wss://s1.ripple.com'
+
+if (!PARENT_BTP_HOST || !XRP_SECRET) {
+  console.error('--parent and --secret must be defined')
+  process.exit(1)
+}
+
 const Connector = require('ilp-connector')
 const crypto = require('crypto')
 const hmac = (key, message) => {
@@ -6,20 +18,15 @@ const hmac = (key, message) => {
   return h.digest()
 }
 
-const parentBtpHmacKey = 'parent_btp_uri'
-const PARENT_BTP_HOST = process.env.PARENT_BTP_HOST
-const XRP_SECRET = process.env.XRP_SECRET
-const XRP_ADDRESS = process.env.XRP_ADDRESS
-const btpSecret = hmac(hmac(parentBtpHmacKey, PARENT_BTP_URI), XRP_SECRET)
-
 // TODO: wss
+const btpSecret = hmac(hmac(parentBtpHmacKey, PARENT_BTP_HOST), XRP_SECRET).toString('hex')
 const parentUri = 'btp+ws://:' + btpSecret + '@' + PARENT_BTP_HOST
-const connector = Connector({
+
+const connector = Connector.createApp({
   spread: 0,
-  routeBroadcastEnabled: false,
   backend: 'one-to-one',
   store: 'ilp-store-memory',
-  initialConnectorTimeout: 60000,
+  initialConnectTimeout: 60000,
   accounts: {
     parent: {
       relation: 'parent',
@@ -31,6 +38,12 @@ const connector = Connector({
         maximum: '10000',
         settleThreshold: '-500',
         settleTo: '0'
+      },
+      options: {
+        xrpServer: XRP_SERVER,
+        server: parentUri,
+        secret: XRP_SECRET,
+        address: XRP_ADDRESS
       }
     },
     local: {
@@ -42,7 +55,20 @@ const connector = Connector({
         minimum: '-Infinity',
         maximum: 'Infinity',
         settleThreshold: '-Infinity'
+      },
+      options: {
+        port: 7768
       }
     }
-  }
+  },
+  routes: [{
+    targetPrefix: 'g.',
+    peerId: 'parent'
+  }]
 })
+
+connector.listen()
+  .catch(e => {
+    console.error('fatal:', e)
+    process.exit(1)
+  })
