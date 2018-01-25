@@ -3,7 +3,7 @@
 require('yargs')
   .option('parent', {
     required: true,
-    description: 'BTP host of your parent connector, e.g. "btp.scyl.la"'
+    description: 'BTP host of your parent connector, e.g. "client.scyl.la"'
   })
   .option('secret', {
     required: true,
@@ -22,6 +22,7 @@ require('yargs')
     process.env.XRP_SECRET = argv.secret
     process.env.XRP_ADDRESS = argv.address
     process.env.XRP_SERVER = argv.rippled
+    process.env.DEBUG = 'ilp*,connector*'
     console.log('set environment; starting moneyd')
     require('..')
   })

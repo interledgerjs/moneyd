@@ -35,8 +35,8 @@ const connector = Connector.createApp({
       balance: {
         minimum: '-Infinity',
         maximum: '10000',
-        settleThreshold: '-500',
-        settleTo: '0'
+        settleThreshold: '1',
+        settleTo: '5000'
       },
       options: {
         xrpServer: XRP_SERVER,

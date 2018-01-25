@@ -6,6 +6,7 @@
   - [Remote Deploy](#remote-deploy)
   - [Settlement](#settlement)
 - [Try it Out](#try-it-out)
+- [Connector List](#connector-list)
 
 ## Description
 
@@ -30,7 +31,7 @@ You'll need:
 - A computer (or remote server) with node 8
 - The secret for a funded XRP account
 - The BTP host of an `ilp-plugin-xrp-asym-server` instance. You can find a suitable
-  parent connector on [ConnectorLand](https://connector.land).
+  parent connector on the [Connector List](#connector-list)
 
 The moneyd package exposes a script for managing your moneyd instance. On your
 own machine (or on a rented server), install node 8 and run:
@@ -99,3 +100,9 @@ curl https://alpha.unhash.io/ff5574cef56e644f3fc4d0311b15a3e95f115080bcc029889f9
 Now you've successfully sent an ILP payment to pay for a file upload! You can
 browse [Interledgerjs on Github](https://github.com/interledgerjs) to find more
 use cases.
+
+## Connector List
+
+(Submit a PR to add your own connector here)
+
+- `client.scyl.la` - N. Virginia
