@@ -97,9 +97,19 @@ curl https://alpha.unhash.io/ff5574cef56e644f3fc4d0311b15a3e95f115080bcc029889f9
 # --> "This is my example file"
 ```
 
-Now you've successfully sent an ILP payment to pay for a file upload! You can
-browse [Interledgerjs on Github](https://github.com/interledgerjs) to find more
-use cases.
+Now you've successfully sent an ILP payment to pay for a file upload!  Another
+way to use ILP is with SPSP, the simple payment setup protocol. This next
+example will send a micropayment to `$sharafian.com`.
+
+```sh
+npm install -g ilp-spsp
+ilp-spsp send --receiver \$sharafian.com --amount 100
+# --> paying 100 to "$sharafian.com"...
+# --> sent!
+```
+
+You can browse [Interledgerjs on Github](https://github.com/interledgerjs) to
+find more use cases.
 
 ## Connector List
 
