@@ -5,6 +5,9 @@ require('yargs')
     required: true,
     description: 'BTP host of your parent connector, e.g. "client.scyl.la"'
   })
+  .option('id', {
+    description: 'ID for this connection. allows you to open several channels to same host.'
+  })
   .option('secret', {
     required: true,
     description: 'XRP secret, "s..."'
@@ -19,6 +22,7 @@ require('yargs')
   })
   .command('start', 'launch moneyd', {}, argv => {
     process.env.PARENT_BTP_HOST = argv.parent
+    process.env.NONCE = argv.id
     process.env.XRP_SECRET = argv.secret
     process.env.XRP_ADDRESS = argv.address
     process.env.XRP_SERVER = argv.rippled
@@ -33,6 +37,7 @@ require('yargs')
     }
   }, argv => {
     process.env.PARENT_BTP_HOST = argv.parent
+    process.env.NONCE = argv.id
     process.env.XRP_SECRET = argv.secret
     process.env.XRP_ADDRESS = argv.address
     process.env.XRP_SERVER = argv.rippled

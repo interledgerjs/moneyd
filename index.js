@@ -3,6 +3,7 @@ const PARENT_BTP_HOST = process.env.PARENT_BTP_HOST
 const XRP_SECRET = process.env.XRP_SECRET
 const XRP_ADDRESS = process.env.XRP_ADDRESS
 const XRP_SERVER = process.env.XRP_SERVER || 'wss://s1.ripple.com'
+const NONCE = process.env.NONCE || ''
 
 if (!PARENT_BTP_HOST || !XRP_SECRET) {
   console.error('--parent and --secret must be defined')
@@ -18,7 +19,7 @@ const hmac = (key, message) => {
 }
 
 // TODO: wss
-const btpSecret = hmac(hmac(parentBtpHmacKey, PARENT_BTP_HOST), XRP_SECRET).toString('hex')
+const btpSecret = hmac(hmac(parentBtpHmacKey, PARENT_BTP_HOST + NONCE), XRP_SECRET).toString('hex')
 const parentUri = 'btp+ws://:' + btpSecret + '@' + PARENT_BTP_HOST
 
 const connector = Connector.createApp({
