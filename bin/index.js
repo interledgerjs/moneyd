@@ -42,7 +42,7 @@ require('yargs')
     console.log('set environment; starting moneyd')
     require('..')
   })
-  .command('settle', 'pre-fund your balance with connector', {
+  .command('topup', 'pre-fund your balance with connector', {
     amount: {
       description: 'amount (in drops) to send to connector',
       default: 1000
