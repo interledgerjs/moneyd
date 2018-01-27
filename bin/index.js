@@ -11,8 +11,8 @@ require('yargs')
   .option('secret', {
     description: 'XRP secret, "s..."'
   })
-  .option('file', {
-    alias: 'f',
+  .option('config', {
+    alias: 'c',
     description: 'JSON file containing options'
   })
   .option('address', {
@@ -24,13 +24,13 @@ require('yargs')
     description: 'Rippled server. Uses S1 server provided by Ripple by default.'
   })
   .command('start', 'launch moneyd', {}, argv => {
-    if (argv.file) {
-      const file = JSON.parse(fs.readFileSync(argv.file).toString())
-      process.env.PARENT_BTP_HOST = file.parent || ''
-      process.env.NONCE = file.id || ''
-      process.env.XRP_SECRET = file.secret || ''
-      process.env.XRP_ADDRESS = file.address || ''
-      process.env.XRP_SERVER = file.rippled || ''
+    if (argv.config) {
+      const config = JSON.parse(fs.readFileSync(argv.config).toString())
+      process.env.PARENT_BTP_HOST = config.parent || ''
+      process.env.NONCE = config.id || ''
+      process.env.XRP_SECRET = config.secret || ''
+      process.env.XRP_ADDRESS = config.address || ''
+      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
     } else {
       process.env.PARENT_BTP_HOST = argv.parent
       process.env.NONCE = argv.id
@@ -48,13 +48,13 @@ require('yargs')
       default: 1000
     }
   }, argv => {
-    if (argv.file) {
-      const file = JSON.parse(fs.readFileSync(argv.file).toString())
-      process.env.PARENT_BTP_HOST = file.parent || ''
-      process.env.NONCE = file.id || ''
-      process.env.XRP_SECRET = file.secret || ''
-      process.env.XRP_ADDRESS = file.address || ''
-      process.env.XRP_SERVER = file.rippled || ''
+    if (argv.config) {
+      const config = JSON.parse(fs.readFileSync(argv.config).toString())
+      process.env.PARENT_BTP_HOST = config.parent || ''
+      process.env.NONCE = config.id || ''
+      process.env.XRP_SECRET = config.secret || ''
+      process.env.XRP_ADDRESS = config.address || ''
+      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
     } else {
       process.env.PARENT_BTP_HOST = argv.parent
       process.env.NONCE = argv.id
@@ -65,5 +65,32 @@ require('yargs')
 
     console.log('set environment; starting moneyd')
     require('./settle.js')
+  })
+  .command('cleanup', 'clean up unused payment channels', {}, argv => {
+    if (argv.config) {
+      const config = JSON.parse(fs.readFileSync(argv.config).toString())
+      process.env.XRP_SECRET = config.secret || ''
+      process.env.XRP_ADDRESS = config.address || ''
+      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
+    } else {
+      process.env.XRP_SECRET = argv.secret
+      process.env.XRP_ADDRESS = argv.address
+      process.env.XRP_SERVER = argv.rippled
+    }
+    require('./cleanup.js')
+  })
+  .command('info', 'get info about your XRP account and payment channels', {}, argv => {
+    if (argv.config) {
+      const config = JSON.parse(fs.readFileSync(argv.config).toString())
+      process.env.XRP_SECRET = config.secret || ''
+      process.env.XRP_ADDRESS = config.address || ''
+      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
+    } else {
+      process.env.XRP_SECRET = argv.secret
+      process.env.XRP_ADDRESS = argv.address
+      process.env.XRP_SERVER = argv.rippled
+    }
+    process.env.INFO_MODE = 'true'
+    require('./cleanup.js')
   })
   .argv

@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "good-table": "^1.0.3",
     "ilp-connector": "interledgerjs/ilp-connector",
     "ilp-plugin-mini-accounts": "^3.0.0",
     "ilp-plugin-xrp-asym-client": "^1.0.0",
