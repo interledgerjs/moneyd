@@ -3,7 +3,7 @@
 
 - [Quickstart](#quick-start)
 - [Description](#description)
-- [Usage](#usage)
+- [Advanced Usage](#usage)
   - [Remote Deploy](#remote-deploy)
   - [Reconciliation](#settlement)
   - [Account Info](#account-info)
@@ -14,20 +14,33 @@
 
 ## Quick Start
 
-You need a ripple secret (with more than 35 XRP), and you need to choose a
-parent host from the [Connector List](#connector-list). The parent host you
-choose will be the counterparty on your payment channel and your uplink to the
-Interledger network.
+You'll need:
 
+- An XRP secret (with more than 35 XRP to cover reserve and channel funding).
+- A parent host from the [Connector List](#connector-list) (to be your uplink into the network).
+
+Create a file called `moneyd.json` and copy the following text into it:
+
+```json
+{
+  "secret": "replace with your XRP secret",
+  "parent": "replace with your parent host from the connector list",
+  "id": "1"
+}
 ```
+
+Replace the values as instructed. Then run:
+
+```sh
 npm install -g moneyd
-moneyd start --secret your_secret_here --parent your_parent_host_here
+moneyd start -c moneyd.json
 ```
+
+Give it a minute to initialize a channel, then you're done!
 
 So long as that command is running, you'll have access to ILP via port 7768.
 For some commands you can do, look at [Sending Payments](#sending-payments).
-
-For more advanced usage of the moneyd command, look at [Usage](#usage).
+For more advanced usage of the moneyd command, look at [Advanced Usage](#advanced-usage).
 
 ## Description
 
@@ -45,36 +58,7 @@ other tools will work right out of the box.
 Because it's in early stages, don't use it
 with a ripple account that has too much money.
 
-## Usage
-
-You'll need:
-
-- A computer (or remote server) with node 8
-- The secret for a funded XRP account (at least 35 XRP)
-- The BTP host of an `ilp-plugin-xrp-asym-server` instance. You can find a suitable
-  parent connector on the [Connector List](#connector-list)
-
-Write a JSON file called `moneyd.json`, containing the following (Substitute
-the placeholder values with your real values):
-
-```json
-{
-  "secret": "your_xrp_secret",
-  "parent": "your_parent_host"
-}
-```
-
-Now you can use that file to launch moneyd.
-
-```sh
-npm install -g moneyd
-moneyd start -c moneyd.json
-```
-
-Moneyd will now launch in your terminal, and run its server on
-`localhost:7768`. _(TODO: Daemonize moneyd)_. Give moneyd a minute or so to do
-first-time setup. It will create a payment channel to your parent connector,
-and then the parent connector will open a payment channel back to you.
+## Advanced Usage
 
 ### Remote Deploy
 
@@ -131,18 +115,20 @@ moneyd cleanup -c moneyd.json
 
 Once you've closed your channels, you may sometime want to connect to your
 parent again. They won't let you connect with the same exact configuration
-after your channel has closed, but not to worry. You can add an extra value
-to your moneyd config to cause it to open a new channel.
+after your channel has closed, but not to worry. You can change the `"id"`
+field in your `moneyd.json` to create a new channel.
 
 ```json
 {
   "secret": "your_xrp_secret",
   "parent": "your_parent_host",
-  "id": "1243"
+  "id": "2"
 }
 ```
 
-If you run into this situation again, you can just change the `"id"`.
+You can keep changing the `"id"` as often as you want. If you run out of XRP
+from opening up channels, just follow [Clean Up Channels](#clean-up-channels)
+to reclaim it.
 
 ## Sending Payments
 
