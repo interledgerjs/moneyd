@@ -49,11 +49,9 @@ async function run () {
     type: 'checkbox',
     name: 'marked',
     message: 'which of these channels would you like to close?',
-    choices: channels.channels.filter(c => {
-      return !c.expiration
-    }).map((c, i) => {
-      return String(i)
-    })
+    choices: channels.channels.map((c, i) => {
+      return !c.expiration && String(i)
+    }).filter(e => e)
   })
 
   for (const index of result.marked) {

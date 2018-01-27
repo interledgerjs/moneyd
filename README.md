@@ -8,7 +8,7 @@
   - [Reconciliation](#settlement)
   - [Account Info](#account-info)
   - [Clean Up Channels](#clean-up-channels)
-  - [Re-establish Channel](#re-establish-channel)
+  - [Multiple Instances](#multiple-instances)
 - [Sending Payments](#sending-payments)
 - [Connector List](#connector-list)
 
@@ -24,8 +24,7 @@ Create a file called `moneyd.json` and copy the following text into it:
 ```json
 {
   "secret": "replace with your XRP secret",
-  "parent": "replace with your parent host from the connector list",
-  "id": "1"
+  "parent": "replace with your parent host from the connector list"
 }
 ```
 
@@ -111,24 +110,28 @@ fully expired your funds will be available again.
 moneyd cleanup -c moneyd.json
 ```
 
-## Re-establish Channel
+If you start moneyd and its previous channel is closing or closed, it will
+automatically open a fresh channel.
 
-Once you've closed your channels, you may sometime want to connect to your
-parent again. They won't let you connect with the same exact configuration
-after your channel has closed, but not to worry. You can change the `"id"`
-field in your `moneyd.json` to create a new channel.
+## Multiple Instances
+
+Sometimes you want to run several instances of moneyd with for the same XRP
+account and parent connector.
+
+In order to distinguish your instances of moneyd, set the `"id"` field in
+your `moneyd.json`.
 
 ```json
 {
   "secret": "your_xrp_secret",
   "parent": "your_parent_host",
-  "id": "2"
+  "id": "1"
 }
 ```
 
-You can keep changing the `"id"` as often as you want. If you run out of XRP
-from opening up channels, just follow [Clean Up Channels](#clean-up-channels)
-to reclaim it.
+You can use as many different `"id"`s as you want. If you run out of XRP from
+opening up channels, just follow [Clean Up Channels](#clean-up-channels) to
+reclaim it.
 
 ## Sending Payments
 
