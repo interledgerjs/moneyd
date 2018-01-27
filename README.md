@@ -1,12 +1,33 @@
 # Moneyd
 > ILP-enable your machine!
 
+- [Quickstart](#quick-start)
 - [Description](#description)
 - [Usage](#usage)
   - [Remote Deploy](#remote-deploy)
-  - [Settlement](#settlement)
-- [Try it Out](#try-it-out)
+  - [Reconciliation](#settlement)
+  - [Account Info](#account-info)
+  - [Clean Up Channels](#clean-up-channels)
+  - [Re-establish Channel](#re-establish-channel)
+- [Sending Payments](#sending-payments)
 - [Connector List](#connector-list)
+
+## Quick Start
+
+You need a ripple secret (with more than 35 XRP), and you need to choose a
+parent host from the [Connector List](#connector-list). The parent host you
+choose will be the counterparty on your payment channel and your uplink to the
+Interledger network.
+
+```
+npm install -g moneyd
+moneyd start --secret your_secret_here --parent your_parent_host_here
+```
+
+So long as that command is running, you'll have access to ILP via port 7768.
+For some commands you can do, look at [Sending Payments](#sending-payments).
+
+For more advanced usage of the moneyd command, look at [Usage](#usage).
 
 ## Description
 
@@ -29,25 +50,31 @@ with a ripple account that has too much money.
 You'll need:
 
 - A computer (or remote server) with node 8
-- The secret for a funded XRP account
+- The secret for a funded XRP account (at least 35 XRP)
 - The BTP host of an `ilp-plugin-xrp-asym-server` instance. You can find a suitable
   parent connector on the [Connector List](#connector-list)
 
-The moneyd package exposes a script for managing your moneyd instance. On your
-own machine (or on a rented server), install node 8 and run:
+Write a JSON file called `moneyd.json`, containing the following (Substitute
+the placeholder values with your real values):
+
+```json
+{
+  "secret": "your_xrp_secret",
+  "parent": "your_parent_host"
+}
+```
+
+Now you can use that file to launch moneyd.
 
 ```sh
 npm install -g moneyd
-moneyd start --secret "s..." --parent "example.com"
+moneyd start -c moneyd.json
 ```
 
-Replace the `s...` and `example.com` with your XRP secret and parent's BTP
-host, respectively. Moneyd will then launch in your terminal, and run its server
-on `localhost:7768`. _(TODO: Daemonize moneyd)_
-
-Give moneyd a minute or so to do first-time setup. It will create a payment channel
-to your parent connector, and then the parent connector will open a payment channel
-back to you.
+Moneyd will now launch in your terminal, and run its server on
+`localhost:7768`. _(TODO: Daemonize moneyd)_. Give moneyd a minute or so to do
+first-time setup. It will create a payment channel to your parent connector,
+and then the parent connector will open a payment channel back to you.
 
 ### Remote Deploy
 
@@ -64,7 +91,7 @@ ssh -N -L 7768:localhost:7768 user@example.com
 
 Replace the `user@example.com` with the server on which you're running moneyd.
 
-### Settlement
+### Reconciliation
 
 If you crash or encounter a bug, you might find that your moneyd instance forgot
 to send a claim to its parent connector. This results in the parent connector thinking
@@ -73,14 +100,51 @@ you owe it money, and refusing to forward any of your packets.
 To fix this, just stop moneyd and run:
 
 ```
-moneyd settle --secret "s..." --parent "example.com" --amount 1000
+moneyd topup -c moneyd.json --amount 1000
 ```
 
 You can adjust the amount if you need to reconcile more. The amount is
 represented in XRP drops; 1000000 is a single XRP so these amounts are
 typically kept quite small.
 
-## Try it out
+### Account Info
+
+You can get information about your XRP account's balance and outstanding
+payment channels. To access this information, run:
+
+```
+moneyd info -c moneyd.json
+```
+
+### Clean Up Channels
+
+Sometimes you want to get your money back out of a payment channel. Moneyd
+provides a tool to do this. Expect it to take an hour for the channel to fully close;
+this gives the counterparty a chance to submit their best claim. Once the channel has
+fully expired your funds will be available again.
+
+```
+moneyd cleanup -c moneyd.json
+```
+
+## Re-establish Channel
+
+Once you've closed your channels, you may sometime want to connect to your
+parent again. They won't let you connect with the same exact configuration
+after your channel has closed, but not to worry. You can add an extra value
+to your moneyd config to cause it to open a new channel.
+
+```json
+{
+  "secret": "your_xrp_secret",
+  "parent": "your_parent_host",
+  "id": "1243"
+}
+```
+
+If you run into this situation again, you can just change the `"id"`.
+
+## Sending Payments
 
 Now that you have moneyd running, you can test it out by uploading a file to unhash.
 Unhash is a simple content-addressed file upload service based on ILP.
