@@ -118,18 +118,20 @@ automatically open a fresh channel.
 Sometimes you want to run several instances of moneyd with for the same XRP
 account and parent connector.
 
-In order to distinguish your instances of moneyd, set the `"id"` field in
-your `moneyd.json`.
+In order to distinguish your instances of moneyd, set (or change) the `"name"`
+field in your `moneyd.json`. This `"name"` will be a segment of your ILP
+address, so it must only use `[A-Za-z0-9\-_~]`. The `"name"` must be unique per
+parent BTP host.
 
 ```json
 {
   "secret": "your_xrp_secret",
   "parent": "your_parent_host",
-  "id": "1"
+  "name": "example-user"
 }
 ```
 
-You can use as many different `"id"`s as you want. If you run out of XRP from
+You can use as many different `"name"`s as you want. If you run out of XRP from
 opening up channels, just follow [Clean Up Channels](#clean-up-channels) to
 reclaim it.
 

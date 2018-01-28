@@ -5,9 +5,6 @@ require('yargs')
   .option('parent', {
     description: 'BTP host of your parent connector, e.g. "client.scyl.la"'
   })
-  .option('id', {
-    description: 'ID for this connection. allows you to open several channels to same host.'
-  })
   .option('secret', {
     description: 'XRP secret, "s..."'
   })
@@ -23,17 +20,21 @@ require('yargs')
     default: 'wss://s1.ripple.com',
     description: 'Rippled server. Uses S1 server provided by Ripple by default.'
   })
+  .option('name', {
+    default: '',
+    description: 'Name to assign to this channel. Must be changed if other parameters are changed.'
+  })
   .command('start', 'launch moneyd', {}, argv => {
     if (argv.config) {
       const config = JSON.parse(fs.readFileSync(argv.config).toString())
+      process.env.BTP_NAME = config.name || ''
       process.env.PARENT_BTP_HOST = config.parent || ''
-      process.env.NONCE = config.id || ''
       process.env.XRP_SECRET = config.secret || ''
       process.env.XRP_ADDRESS = config.address || ''
       process.env.XRP_SERVER = config.rippled || argv.rippled || ''
     } else {
+      process.env.BTP_NAME = argv.name
       process.env.PARENT_BTP_HOST = argv.parent
-      process.env.NONCE = argv.id
       process.env.XRP_SECRET = argv.secret
       process.env.XRP_ADDRESS = argv.address
       process.env.XRP_SERVER = argv.rippled
@@ -50,14 +51,14 @@ require('yargs')
   }, argv => {
     if (argv.config) {
       const config = JSON.parse(fs.readFileSync(argv.config).toString())
+      process.env.BTP_NAME = config.name || ''
       process.env.PARENT_BTP_HOST = config.parent || ''
-      process.env.NONCE = config.id || ''
       process.env.XRP_SECRET = config.secret || ''
       process.env.XRP_ADDRESS = config.address || ''
       process.env.XRP_SERVER = config.rippled || argv.rippled || ''
     } else {
+      process.env.BTP_NAME = argv.name
       process.env.PARENT_BTP_HOST = argv.parent
-      process.env.NONCE = argv.id
       process.env.XRP_SECRET = argv.secret
       process.env.XRP_ADDRESS = argv.address
       process.env.XRP_SERVER = argv.rippled
