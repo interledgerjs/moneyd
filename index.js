@@ -20,7 +20,7 @@ const hmac = (key, message) => {
 
 // TODO: wss
 const btpSecret = hmac(hmac(parentBtpHmacKey, PARENT_BTP_HOST + BTP_NAME), XRP_SECRET).toString('hex')
-const parentUri = 'btp+ws://' + BTP_NAME + ':' + btpSecret + '@' + PARENT_BTP_HOST
+const parentUri = 'btp+wss://' + BTP_NAME + ':' + btpSecret + '@' + PARENT_BTP_HOST
 
 const connector = Connector.createApp({
   spread: 0,
