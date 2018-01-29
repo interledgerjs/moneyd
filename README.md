@@ -26,6 +26,8 @@ moneyd configure -c moneyd.json --secret YOUR_XRP_SECRET
 moneyd start -c moneyd.json
 ```
 
+Your XRP secret (or "seed") is the base58-encoded string that starts with an 's'.
+
 Give it a minute to initialize a channel, then you're done!
 
 So long as that command is running, you'll have access to ILP via port 7768.
