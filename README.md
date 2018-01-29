@@ -17,21 +17,12 @@
 You'll need:
 
 - An XRP secret (with more than 35 XRP to cover reserve and channel funding).
-- A parent host from the [Connector List](#connector-list) (to be your uplink into the network).
 
-Create a file called `moneyd.json` and copy the following text into it:
-
-```json
-{
-  "secret": "replace with your XRP secret",
-  "parent": "replace with your parent host from the connector list"
-}
-```
-
-Replace the values as instructed. Then run:
+Just run:
 
 ```sh
 npm install -g moneyd
+moneyd configure -c moneyd.json --secret YOUR_XRP_SECRET
 moneyd start -c moneyd.json
 ```
 

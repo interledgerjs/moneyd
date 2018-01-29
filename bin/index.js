@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('fs')
+const inquirer = require('inquirer')
 
 require('yargs')
   .option('parent', {
@@ -10,7 +11,7 @@ require('yargs')
   })
   .option('config', {
     alias: 'c',
-    description: 'JSON file containing options'
+    description: 'JSON config file'
   })
   .option('address', {
     description: 'XRP address. Can be derived from secret.',
@@ -93,5 +94,46 @@ require('yargs')
     }
     process.env.INFO_MODE = 'true'
     require('./cleanup.js')
+  })
+  .command('configure', 'generate a configuration file', {}, async argv => {
+    if (!argv.config) {
+      console.error('config file to output must be specified (--config)')
+      process.exit(1)
+    }
+
+    if (!argv.secret) {
+      console.error('XRP secret must be specified (--secret)')
+      process.exit(1)
+    }
+
+    if (fs.existsSync(argv.config)) {
+      console.error('config file already exists. file=' + argv.config)
+      process.exit(1)
+    }
+
+    if (!argv.parent) {
+      console.log('selecting a parent from connector list...')
+    }
+
+    const servers = require('../connector_list.json')
+    const parent = argv.parent || servers[Math.floor(Math.random() * servers.length)]
+
+    const config = {
+      secret: argv.secret,
+      rippled: argv.rippled,
+      parent
+    }
+
+    if (argv.name) {
+      config.name = argv.name
+    }
+
+    if (argv.address) {
+      config.address = argv.address
+    }
+
+    console.log('writing config file...')
+    fs.writeFileSync(argv.config, JSON.stringify(config, null, 2))
+    console.log('written to', argv.config)
   })
   .argv
