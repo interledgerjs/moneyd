@@ -15,6 +15,7 @@
     "ilp-plugin-mini-accounts": "^3.2.3",
     "ilp-plugin-xrp-asym-client": "^1.0.3",
     "ilp-store-memory": "^1.0.0",
+    "inquirer": "^5.0.1",
     "yargs": "^10.1.1"
   },
   "bin": {
