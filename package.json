@@ -1,6 +1,6 @@
 {
   "name": "moneyd",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "ILP provider using XRP payment channels",
   "main": "index.js",
   "scripts": {
