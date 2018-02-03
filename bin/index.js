@@ -1,9 +1,20 @@
 #!/usr/bin/env node
+const chalk = require('chalk')
 const fs = require('fs')
 const fetch = require('node-fetch')
 const inquirer = require('inquirer')
 const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
+const banner = chalk.green(`                                                                           88
+                                                                           88
+                                                                           88
+88,dPYba,,adPYba,   ,adPPYba,  8b,dPPYba,   ,adPPYba, 8b       d8  ,adPPYb,88
+88P'   "88"    "8a a8"     "8a 88P'   \`"8a a8P_____88 \`8b     d8' a8"    \`Y88
+88      88      88 8b       d8 88       88 8PP"""""""  \`8b   d8'  8b       88
+88      88      88 "8a,   ,a8" 88       88 "8b,   ,aa   \`8b,d8'   "8a,   ,d88
+88      88      88  \`"YbbdP"'  88       88  \`"Ybbd8"'     Y88'     \`"8bbdP"Y8
+                                                          d8'
+                                                         d8'`)
 
 require('yargs')
   .option('parent', {
@@ -28,7 +39,14 @@ require('yargs')
     default: '',
     description: 'Name to assign to this channel. Must be changed if other parameters are changed.'
   })
-  .command('start', 'launch moneyd', {}, argv => {
+  .command('start', 'launch moneyd', {
+    quiet: {
+      alias: 'q',
+      type: 'boolean',
+      default: false,
+      description: 'Don\'t print the banner on startup.'
+    }
+  }, argv => {
     if (argv.config) {
       const config = JSON.parse(fs.readFileSync(argv.config).toString())
       process.env.BTP_NAME = config.name || ''
@@ -42,6 +60,10 @@ require('yargs')
       process.env.XRP_SECRET = argv.secret
       process.env.XRP_ADDRESS = argv.address
       process.env.XRP_SERVER = argv.rippled
+    }
+
+    if (!argv.quiet) {
+      console.log(banner)
     }
 
     console.log('set environment; starting moneyd')
