@@ -14,8 +14,35 @@
 
 ## Quick Start
 
+If you already have an XRP account with 35 XRP or more, use the [Livenet](#live-network) instructions.
+Otherwise, you can still follow the [Testnet](#test-network) instructions.
+
+### Test Network
+
 You'll need:
 
+- Node v8.9.4 or higher.
+- Permissions to install global node modules.
+
+```sh
+npm install -g moneyd
+moneyd configure -c moneyd_test.json --testnet
+moneyd start -c moneyd_test.json
+```
+
+Give it a minute to initialize a channel, then you're done!
+
+So long as that command is running, you'll have access to ILP via port 7768.
+The [Sending Payments](#sending-payments) section describes servers on the live
+network right now, but will soon be updated to include examples that you can
+try from the test network.
+
+### Live Network
+
+You'll need:
+
+- Node v8.9.4 or higher.
+- Permissions to install global node modules.
 - An XRP secret (with more than 35 XRP to cover reserve and channel funding).
 
 Just run:

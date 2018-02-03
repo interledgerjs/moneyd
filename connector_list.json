@@ -1,3 +1,8 @@
-[
-  "client.scyl.la"
-]
+{
+  "live": [
+    "client.scyl.la"
+  ],
+  "test": [
+    "amundsen.ilpdemo.org:1801"
+  ]
+}

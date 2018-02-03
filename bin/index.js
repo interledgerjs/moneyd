@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 const fs = require('fs')
+const fetch = require('node-fetch')
 const inquirer = require('inquirer')
+const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
+const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
 
 require('yargs')
   .option('parent', {
@@ -95,15 +98,38 @@ require('yargs')
     process.env.INFO_MODE = 'true'
     require('./cleanup.js')
   })
-  .command('configure', 'generate a configuration file', {}, async argv => {
+  .command('configure', 'generate a configuration file', {
+    testnet: {
+      alias: 't',
+      type: 'boolean',
+      default: false
+    }
+  }, async argv => {
     if (!argv.config) {
       console.error('config file to output must be specified (--config)')
       process.exit(1)
     }
 
-    if (!argv.secret) {
+    if (!argv.testnet && !argv.secret) {
       console.error('XRP secret must be specified (--secret)')
       process.exit(1)
+    }
+
+    if (argv.testnet) {
+      if (argv.rippled === DEFAULT_RIPPLED) {
+        console.log('setting testnet rippled server...')
+        argv.rippled = DEFAULT_TESTNET_RIPPLED
+      }
+
+      if (!argv.secret) {
+        console.log('acquiring testnet account...')
+        const res = await fetch('https://faucet.altnet.rippletest.net/accounts', { method: 'POST' })
+        const json = await res.json()
+
+        argv.address = json.account.address
+        argv.secret = json.account.secret
+        console.log('got testnet address "' + argv.address + '"')
+      }
     }
 
     if (fs.existsSync(argv.config)) {
@@ -115,7 +141,8 @@ require('yargs')
       console.log('selecting a parent from connector list...')
     }
 
-    const servers = require('../connector_list.json')
+    const list = require('../connector_list.json')
+    const servers = list[argv.testnet ? 'test' : 'live']
     const parent = argv.parent || servers[Math.floor(Math.random() * servers.length)]
 
     const config = {
