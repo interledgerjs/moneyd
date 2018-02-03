@@ -163,4 +163,8 @@ require('yargs')
     fs.writeFileSync(argv.config, JSON.stringify(config, null, 2))
     console.log('written to', argv.config)
   })
+  .command('*', '', {}, argv => {
+    console.error('unknown command.')
+    process.exit(0)
+  })
   .argv
