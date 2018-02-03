@@ -2,6 +2,8 @@
 > ILP-enable your machine!
 
 - [Quickstart](#quick-start)
+  - [Test Network](#test-network)
+  - [Live Network](#live-network)
 - [Description](#description)
 - [Advanced Usage](#usage)
   - [Remote Deploy](#remote-deploy)
