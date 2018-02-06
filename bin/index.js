@@ -3,7 +3,6 @@ const chalk = require('chalk')
 const path = require('path')
 const fs = require('fs')
 const fetch = require('node-fetch')
-const inquirer = require('inquirer')
 const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
 const DEFAULT_CONFIG = path.join(process.env.HOME, '.moneyd.json')
@@ -40,7 +39,7 @@ require('yargs')
     }
   }, argv => {
     if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG 
+      argv.config = DEFAULT_TESTNET_CONFIG
     }
 
     if (!fs.existsSync(argv.config)) {
@@ -69,7 +68,7 @@ require('yargs')
     }
   }, argv => {
     if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG 
+      argv.config = DEFAULT_TESTNET_CONFIG
     }
 
     if (!fs.existsSync(argv.config)) {
@@ -89,7 +88,7 @@ require('yargs')
   })
   .command('cleanup', 'clean up unused payment channels', {}, argv => {
     if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG 
+      argv.config = DEFAULT_TESTNET_CONFIG
     }
 
     if (!fs.existsSync(argv.config)) {
@@ -106,7 +105,7 @@ require('yargs')
   })
   .command('info', 'get info about your XRP account and payment channels', {}, argv => {
     if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG 
+      argv.config = DEFAULT_TESTNET_CONFIG
     }
 
     if (!fs.existsSync(argv.config)) {
