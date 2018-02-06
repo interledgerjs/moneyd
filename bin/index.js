@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 const chalk = require('chalk')
+const path = require('path')
 const fs = require('fs')
 const fetch = require('node-fetch')
 const inquirer = require('inquirer')
 const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
+const DEFAULT_CONFIG = path.join(process.env.HOME, '.moneyd.json')
+const DEFAULT_TESTNET_CONFIG = path.join(process.env.HOME, '.moneyd.test.json')
 const banner = chalk.green(`                                                                           88
                                                                            88
                                                                            88
@@ -17,27 +20,16 @@ const banner = chalk.green(`                                                    
                                                          d8'`)
 
 require('yargs')
-  .option('parent', {
-    description: 'BTP host of your parent connector, e.g. "client.scyl.la"'
-  })
-  .option('secret', {
-    description: 'XRP secret, "s..."'
-  })
   .option('config', {
     alias: 'c',
+    default: DEFAULT_CONFIG,
     description: 'JSON config file'
   })
-  .option('address', {
-    description: 'XRP address. Can be derived from secret.',
-    default: ''
-  })
-  .option('rippled', {
-    default: 'wss://s1.ripple.com',
-    description: 'Rippled server. Uses S1 server provided by Ripple by default.'
-  })
-  .option('name', {
-    default: '',
-    description: 'Name to assign to this channel. Must be changed if other parameters are changed.'
+  .option('testnet', {
+    alias: 't',
+    type: 'boolean',
+    default: false,
+    description: 'Whether to use the testnet config file'
   })
   .command('start', 'launch moneyd', {
     quiet: {
@@ -47,20 +39,21 @@ require('yargs')
       description: 'Don\'t print the banner on startup.'
     }
   }, argv => {
-    if (argv.config) {
-      const config = JSON.parse(fs.readFileSync(argv.config).toString())
-      process.env.BTP_NAME = config.name || ''
-      process.env.PARENT_BTP_HOST = config.parent || ''
-      process.env.XRP_SECRET = config.secret || ''
-      process.env.XRP_ADDRESS = config.address || ''
-      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-    } else {
-      process.env.BTP_NAME = argv.name
-      process.env.PARENT_BTP_HOST = argv.parent
-      process.env.XRP_SECRET = argv.secret
-      process.env.XRP_ADDRESS = argv.address
-      process.env.XRP_SERVER = argv.rippled
+    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
+      argv.config = DEFAULT_TESTNET_CONFIG 
     }
+
+    if (!fs.existsSync(argv.config)) {
+      console.error('config file does not exist. file=' + argv.config)
+      process.exit(1)
+    }
+
+    const config = JSON.parse(fs.readFileSync(argv.config).toString())
+    process.env.BTP_NAME = config.name || ''
+    process.env.PARENT_BTP_HOST = config.parent || ''
+    process.env.XRP_SECRET = config.secret || ''
+    process.env.XRP_ADDRESS = config.address || ''
+    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
 
     if (!argv.quiet) {
       console.log(banner)
@@ -75,56 +68,78 @@ require('yargs')
       default: 1000
     }
   }, argv => {
-    if (argv.config) {
-      const config = JSON.parse(fs.readFileSync(argv.config).toString())
-      process.env.BTP_NAME = config.name || ''
-      process.env.PARENT_BTP_HOST = config.parent || ''
-      process.env.XRP_SECRET = config.secret || ''
-      process.env.XRP_ADDRESS = config.address || ''
-      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-    } else {
-      process.env.BTP_NAME = argv.name
-      process.env.PARENT_BTP_HOST = argv.parent
-      process.env.XRP_SECRET = argv.secret
-      process.env.XRP_ADDRESS = argv.address
-      process.env.XRP_SERVER = argv.rippled
+    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
+      argv.config = DEFAULT_TESTNET_CONFIG 
     }
+
+    if (!fs.existsSync(argv.config)) {
+      console.error('config file does not exist. file=' + argv.config)
+      process.exit(1)
+    }
+
+    const config = JSON.parse(fs.readFileSync(argv.config).toString())
+    process.env.BTP_NAME = config.name || ''
+    process.env.PARENT_BTP_HOST = config.parent || ''
+    process.env.XRP_SECRET = config.secret || ''
+    process.env.XRP_ADDRESS = config.address || ''
+    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
 
     console.log('set environment; starting moneyd')
     require('./settle.js')
   })
   .command('cleanup', 'clean up unused payment channels', {}, argv => {
-    if (argv.config) {
-      const config = JSON.parse(fs.readFileSync(argv.config).toString())
-      process.env.XRP_SECRET = config.secret || ''
-      process.env.XRP_ADDRESS = config.address || ''
-      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-    } else {
-      process.env.XRP_SECRET = argv.secret
-      process.env.XRP_ADDRESS = argv.address
-      process.env.XRP_SERVER = argv.rippled
+    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
+      argv.config = DEFAULT_TESTNET_CONFIG 
     }
+
+    if (!fs.existsSync(argv.config)) {
+      console.error('config file does not exist. file=' + argv.config)
+      process.exit(1)
+    }
+
+    const config = JSON.parse(fs.readFileSync(argv.config).toString())
+    process.env.XRP_SECRET = config.secret || ''
+    process.env.XRP_ADDRESS = config.address || ''
+    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
+
     require('./cleanup.js')
   })
   .command('info', 'get info about your XRP account and payment channels', {}, argv => {
-    if (argv.config) {
-      const config = JSON.parse(fs.readFileSync(argv.config).toString())
-      process.env.XRP_SECRET = config.secret || ''
-      process.env.XRP_ADDRESS = config.address || ''
-      process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-    } else {
-      process.env.XRP_SECRET = argv.secret
-      process.env.XRP_ADDRESS = argv.address
-      process.env.XRP_SERVER = argv.rippled
+    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
+      argv.config = DEFAULT_TESTNET_CONFIG 
     }
+
+    if (!fs.existsSync(argv.config)) {
+      console.error('config file does not exist. file=' + argv.config)
+      process.exit(1)
+    }
+
+    const config = JSON.parse(fs.readFileSync(argv.config).toString())
+    process.env.XRP_SECRET = config.secret || ''
+    process.env.XRP_ADDRESS = config.address || ''
+    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
     process.env.INFO_MODE = 'true'
+
     require('./cleanup.js')
   })
   .command('configure', 'generate a configuration file', {
-    testnet: {
-      alias: 't',
-      type: 'boolean',
-      default: false
+    parent: {
+      description: 'BTP host of your parent connector, e.g. "client.scyl.la"'
+    },
+    secret: {
+      description: 'XRP secret, "s..."'
+    },
+    address: {
+      description: 'XRP address. Can be derived from secret.',
+      default: ''
+    },
+    rippled: {
+      default: 'wss://s1.ripple.com',
+      description: 'Rippled server. Uses S1 server provided by Ripple by default.'
+    },
+    name: {
+      default: '',
+      description: 'Name to assign to this channel. Must be changed if other parameters are changed.'
     }
   }, async argv => {
     if (!argv.config) {
@@ -141,6 +156,11 @@ require('yargs')
       if (argv.rippled === DEFAULT_RIPPLED) {
         console.log('setting testnet rippled server...')
         argv.rippled = DEFAULT_TESTNET_RIPPLED
+      }
+
+      if (argv.config === DEFAULT_CONFIG) {
+        console.log('setting config file location to ' + DEFAULT_TESTNET_CONFIG)
+        argv.config = DEFAULT_TESTNET_CONFIG
       }
 
       if (!argv.secret) {

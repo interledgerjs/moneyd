@@ -6,6 +6,7 @@
   - [Live Network](#live-network)
 - [Description](#description)
 - [Advanced Usage](#usage)
+  - [Command-Line Options](#command-line-options)
   - [Remote Deploy](#remote-deploy)
   - [Reconciliation](#settlement)
   - [Account Info](#account-info)
@@ -28,11 +29,12 @@ You'll need:
 
 ```sh
 npm install -g moneyd
-moneyd configure -c moneyd_test.json --testnet
-moneyd start -c moneyd_test.json
+moneyd configure --testnet
+moneyd start --testnet
 ```
 
-Give it a minute to initialize a channel, then you're done!
+Give it a minute to initialize a channel, then you're done! A configuration
+file will be created in `~/.moneyd.test.json`.
 
 So long as that command is running, you'll have access to ILP via port 7768.
 The [Sending Payments](#sending-payments) section describes servers on the live
@@ -51,13 +53,15 @@ Just run:
 
 ```sh
 npm install -g moneyd
-moneyd configure -c moneyd.json --secret YOUR_XRP_SECRET
-moneyd start -c moneyd.json
+moneyd configure --secret YOUR_XRP_SECRET
+moneyd start
 ```
 
 Your XRP secret (or "seed") is the base58-encoded string that starts with an 's'.
 
-Give it a minute to initialize a channel, then you're done!
+Give it a minute to initialize a channel, then you're done! A configuration
+file will be created in `~/.moneyd.json`.
+
 
 So long as that command is running, you'll have access to ILP via port 7768.
 For some commands you can do, look at [Sending Payments](#sending-payments).
@@ -80,6 +84,25 @@ Because it's in early stages, don't use it
 with a ripple account that has too much money.
 
 ## Advanced Usage
+
+### Command-Line Options
+
+For any of the commands below, you can use a config file in a non-standard
+location with `-c`. If you have configured your moneyd instance with
+`--testnet`, then you should also add the `--testnet` flag to any commands
+specified in this section.
+
+To view a complete list of the moneyd flags, run:
+
+```
+moneyd help
+```
+
+If you want to see the options for a specific command, pass `--help`. For example:
+
+```
+moneyd configure --help
+```
 
 ### Remote Deploy
 
@@ -105,7 +128,7 @@ you owe it money, and refusing to forward any of your packets.
 To fix this, just stop moneyd and run:
 
 ```
-moneyd topup -c moneyd.json --amount 1000
+moneyd topup --amount 1000
 ```
 
 You can adjust the amount if you need to reconcile more. The amount is
@@ -118,7 +141,7 @@ You can get information about your XRP account's balance and outstanding
 payment channels. To access this information, run:
 
 ```
-moneyd info -c moneyd.json
+moneyd info
 ```
 
 ### Clean Up Channels
@@ -129,7 +152,7 @@ this gives the counterparty a chance to submit their best claim. Once the channe
 fully expired your funds will be available again.
 
 ```
-moneyd cleanup -c moneyd.json
+moneyd cleanup
 ```
 
 If you start moneyd and its previous channel is closing or closed, it will
@@ -141,7 +164,7 @@ Sometimes you want to run several instances of moneyd with for the same XRP
 account and parent connector.
 
 In order to distinguish your instances of moneyd, set (or change) the `"name"`
-field in your `moneyd.json`. This `"name"` will be a segment of your ILP
+field in your `~/.moneyd.json`. This `"name"` will be a segment of your ILP
 address, so it must only use `[A-Za-z0-9\-_~]`. The `"name"` must be unique per
 parent BTP host.
 
