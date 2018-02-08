@@ -30,6 +30,10 @@ require('yargs')
     default: false,
     description: 'Whether to use the testnet config file'
   })
+  .command('local', 'launch moneyd with no uplink into the network, for local testing', {}, argv => {
+    console.log('launching local moneyd...')
+    require('./local')
+  })
   .command('start', 'launch moneyd', {
     quiet: {
       alias: 'q',

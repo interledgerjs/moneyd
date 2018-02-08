@@ -4,6 +4,7 @@
 - [Quickstart](#quick-start)
   - [Test Network](#test-network)
   - [Live Network](#live-network)
+  - [Local Test Network](#local-test-network)
 - [Description](#description)
 - [Advanced Usage](#usage)
   - [Command-Line Options](#command-line-options)
@@ -18,7 +19,8 @@
 ## Quick Start
 
 If you already have an XRP account with 35 XRP or more, use the [Livenet](#live-network) instructions.
-Otherwise, you can still follow the [Testnet](#test-network) instructions.
+Otherwise, you can still follow the [Testnet](#test-network) instructions. For development in an offline
+environment, you can run your own [Local Testnet](#local-test-network). 
 
 ### Test Network
 
@@ -66,6 +68,20 @@ file will be created in `~/.moneyd.json`.
 So long as that command is running, you'll have access to ILP via port 7768.
 For some commands you can do, look at [Sending Payments](#sending-payments).
 For more advanced usage of the moneyd command, look at [Advanced Usage](#advanced-usage).
+
+### Local Test Network
+
+If you're just doing local development, you may not care about being connected
+to any network.  Moneyd allows you to run an isolated local test network for
+this scenario. Run:
+
+```
+npm install -g moneyd
+moneyd local
+```
+
+This exposes ILP access via port 7768, but any application connected to this
+port will only be able to pay other applications on the same machine.
 
 ## Description
 
