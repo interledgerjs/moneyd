@@ -60,7 +60,8 @@ const connector = Connector.createApp({
         wsOpts: {
           host: 'localhost',
           port: 7768
-        }
+        },
+        allowedOrigins: JSON.parse(process.env.ALLOW_ORIGIN)
       }
     }
   },
