@@ -24,6 +24,15 @@ require('yargs')
     default: DEFAULT_CONFIG,
     description: 'JSON config file'
   })
+  .option('unsafe-allow-extensions', {
+    type: 'boolean',
+    default: false,
+    description: 'Whether to accept connections from arbitrary browser extensions (Warning: this is unsafe)'
+  })
+  .option('allow-origin', {
+    type: 'string',
+    description: 'Accept connections from the indicated origin'
+  })
   .option('testnet', {
     alias: 't',
     type: 'boolean',
@@ -42,6 +51,11 @@ require('yargs')
       description: 'Don\'t print the banner on startup.'
     }
   }, argv => {
+    const origins = []
+      .concat(argv['allow-origin'] || [])
+      .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
+    process.env.ALLOW_ORIGIN = JSON.stringify(origins)
+
     if (argv.testnet && argv.config === DEFAULT_CONFIG) {
       argv.config = DEFAULT_TESTNET_CONFIG
     }
