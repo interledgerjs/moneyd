@@ -13,7 +13,7 @@
     "chalk": "^2.3.0",
     "good-table": "^1.0.3",
     "ilp-connector": "interledgerjs/ilp-connector",
-    "ilp-plugin-mini-accounts": "^3.2.5",
+    "ilp-plugin-mini-accounts": "^3.3.1",
     "ilp-plugin-xrp-asym-client": "^1.1.4",
     "ilp-store-memory": "^1.0.0",
     "inquirer": "^5.0.1",
