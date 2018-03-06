@@ -207,7 +207,7 @@ to moneyd and send money to the unhash host.
 ```sh
 npm install -g ilp-curl
 echo "This is my example file" > example.txt
-ilp-curl -X POST https://alpha.unhash.io/upload --data @example.txt
+ilp-curl -X POST https://alpha.unhash.io --data @example.txt
 # --> {"digest":"ff5574cef56e644f3fc4d0311b15a3e95f115080bcc029889f9e32121fd60407"}
 curl https://alpha.unhash.io/ff5574cef56e644f3fc4d0311b15a3e95f115080bcc029889f9e32121fd60407
 # --> "This is my example file"
