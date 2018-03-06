@@ -4,7 +4,7 @@ const connector = Connector.createApp({
   backend: 'one-to-one',
   store: 'ilp-store-memory',
   initialConnectTimeout: 60000,
-  ilpAddress: 'test.moneyd.',
+  ilpAddress: 'test.moneyd',
   accounts: {
     local: {
       relation: 'child',
@@ -20,7 +20,8 @@ const connector = Connector.createApp({
         wsOpts: {
           host: 'localhost',
           port: 7768
-        }
+        },
+        allowedOrigins: JSON.parse(process.env.ALLOW_ORIGIN)
       }
     }
   }

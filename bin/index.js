@@ -41,6 +41,12 @@ require('yargs')
   })
   .command('local', 'launch moneyd with no uplink into the network, for local testing', {}, argv => {
     console.log('launching local moneyd...')
+
+    const origins = []
+      .concat(argv['allow-origin'] || [])
+      .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
+    process.env.ALLOW_ORIGIN = JSON.stringify(origins)
+
     require('./local')
   })
   .command('start', 'launch moneyd', {
