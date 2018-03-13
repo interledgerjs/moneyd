@@ -6,6 +6,9 @@
   - [Live Network](#live-network)
   - [Local Test Network](#local-test-network)
 - [Description](#description)
+- [Writing ILP Applications](#writing-ilp-applications)
+  - [Making an SPSP Payment](#making-an-spsp-payment)
+  - [How Does "ilp-plugin" Work?](#how-does-ilp-plugin-work)
 - [Advanced Usage](#usage)
   - [Command-Line Options](#command-line-options)
   - [Remote Deploy](#remote-deploy)
@@ -98,6 +101,61 @@ other tools will work right out of the box.
 
 Because it's in early stages, don't use it
 with a ripple account that has too much money.
+
+## Writing ILP Applications
+
+One of the biggest reasons to run moneyd is that it lets you develop your own
+applications that run on top of Interledger. Connecting to Moneyd is as easy as
+installing [`ilp-plugin`](https://www.npmjs.com/package/ilp-plugin) and adding
+a single line of code to your project:
+
+```
+const plugin = require('ilp-plugin')()
+```
+
+This Interledger
+[Plugin](https://github.com/interledger/rfcs/blob/master/0024-ledger-plugin-interface-2/0024-ledger-plugin-interface-2.md)
+is a connection to your Moneyd instance. You can then pass it into other
+modules to send payments through your Moneyd.
+
+### Making an SPSP Payment
+
+The snippet of code below shows how to use `ilp-plugin` and
+[`ilp-protocol-spsp`] to pay the identifier `$sharafian.com`. This identifier
+is only reachable on the livenet; If you want to send to somewhere on the
+testnet, use [SPSP server](https://github.com/sharafian/ilp-spsp-server) to
+create your own receiver.
+
+```
+const plugin = require('ilp-plugin')()
+const SPSP = require('ilp-protocol-spsp')
+
+async function run () {
+  console.log('paying $sharafian.com...')
+
+  await SPSP.pay(plugin, {
+    receiver: '$sharafian.com',
+    sourceAmount: '10'
+  })
+
+  console.log('paid!')
+}
+
+run().catch(e => console.error(e))
+```
+
+### How Does "ilp-plugin" Work?
+
+`ilp-plugin` has very simple default behavior. If you run
+`require('ilp-plugin')()`, it creates an instance of [ILP Plugin
+BTP](https://github.com/interledgerjs/ilp-plugin-btp) that connects to port
+7768 on your local machine.
+
+You can also customize the behavior of `ilp-plugin` using [environment
+variables](https://en.wikipedia.org/wiki/Environment_variable#Unix).
+
+- `ILP_CREDENTIALS` - A JSON object that contains the parameters to be passed into your plugin's constructor. Default: `'{"server":"btp+ws://:<RANDOM_SECRET>@localhost:7768"}'`.
+- `ILP_PLUGIN` - An NPM module name for the plugin you want to use. Default: `'ilp-plugin-btp'`.
 
 ## Advanced Usage
 
