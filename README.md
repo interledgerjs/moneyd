@@ -42,9 +42,8 @@ Give it a minute to initialize a channel, then you're done! A configuration
 file will be created in `~/.moneyd.test.json`.
 
 So long as that command is running, you'll have access to ILP via port 7768.
-The [Sending Payments](#sending-payments) section describes servers on the live
-network right now, but will soon be updated to include examples that you can
-try from the test network.
+To try it out, follow the [Sending Payments](#sending-payments) section, and
+use the alternate endpoints listed for the testnet.
 
 ### Live Network
 
@@ -133,6 +132,7 @@ const SPSP = require('ilp-protocol-spsp')
 async function run () {
   console.log('paying $sharafian.com...')
 
+  # use '$spsp.ilp-test.com' if you're on the testnet
   await SPSP.pay(plugin, {
     receiver: '$sharafian.com',
     sourceAmount: '10'
@@ -265,8 +265,11 @@ to moneyd and send money to the unhash host.
 ```sh
 npm install -g ilp-curl
 echo "This is my example file" > example.txt
+
+# use "https://unhash.ilp-test.com" if you're on the testnet"
 ilp-curl -X POST https://alpha.unhash.io --data @example.txt
 # --> {"digest":"ff5574cef56e644f3fc4d0311b15a3e95f115080bcc029889f9e32121fd60407"}
+
 curl https://alpha.unhash.io/ff5574cef56e644f3fc4d0311b15a3e95f115080bcc029889f9e32121fd60407
 # --> "This is my example file"
 ```
@@ -277,7 +280,10 @@ example will send a micropayment to `$sharafian.com`.
 
 ```sh
 npm install -g ilp-spsp
+
+# use "$spsp.ilp-test.com" if you're on the testnet
 ilp-spsp send --receiver \$sharafian.com --amount 100
+
 # --> paying 100 to "$sharafian.com"...
 # --> sent!
 ```
