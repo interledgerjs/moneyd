@@ -120,7 +120,7 @@ modules to send payments through your Moneyd.
 ### Making an SPSP Payment
 
 The snippet of code below shows how to use `ilp-plugin` and
-[`ilp-protocol-spsp`] to pay the identifier `$sharafian.com`. This identifier
+[`ilp-protocol-spsp`](https://github.com/sharafian/ilp-protocol-spsp) to pay the identifier `$sharafian.com`. This identifier
 is only reachable on the livenet; If you want to send to somewhere on the
 testnet, use [SPSP server](https://github.com/sharafian/ilp-spsp-server) to
 create your own receiver.
@@ -132,7 +132,7 @@ const SPSP = require('ilp-protocol-spsp')
 async function run () {
   console.log('paying $sharafian.com...')
 
-  # use '$spsp.ilp-test.com' if you're on the testnet
+  // use '$spsp.ilp-test.com' if you're on the testnet
   await SPSP.pay(plugin, {
     receiver: '$sharafian.com',
     sourceAmount: '10'
