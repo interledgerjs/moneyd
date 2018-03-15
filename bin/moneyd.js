@@ -3,6 +3,8 @@ const chalk = require('chalk')
 const path = require('path')
 const fs = require('fs')
 const fetch = require('node-fetch')
+const Config = require('../src/config')
+const moneyd = require('../src')
 const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
 const DEFAULT_CONFIG = path.join(process.env.HOME, '.moneyd.json')
@@ -41,13 +43,10 @@ require('yargs')
   })
   .command('local', 'launch moneyd with no uplink into the network, for local testing', {}, argv => {
     console.log('launching local moneyd...')
-
-    const origins = []
+    const allowedOrigins = []
       .concat(argv['allow-origin'] || [])
       .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
-    process.env.ALLOW_ORIGIN = JSON.stringify(origins)
-
-    require('./local')
+    moneyd.startLocal(allowedOrigins).catch(onError)
   })
   .command('start', 'launch moneyd', {
     quiet: {
@@ -57,33 +56,16 @@ require('yargs')
       description: 'Don\'t print the banner on startup.'
     }
   }, argv => {
-    const origins = []
+    const allowedOrigins = []
       .concat(argv['allow-origin'] || [])
       .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
-    process.env.ALLOW_ORIGIN = JSON.stringify(origins)
-
-    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG
-    }
-
-    if (!fs.existsSync(argv.config)) {
-      console.error('config file does not exist. file=' + argv.config)
-      process.exit(1)
-    }
-
-    const config = JSON.parse(fs.readFileSync(argv.config).toString())
-    process.env.BTP_NAME = config.name || ''
-    process.env.PARENT_BTP_HOST = config.parent || ''
-    process.env.XRP_SECRET = config.secret || ''
-    process.env.XRP_ADDRESS = config.address || ''
-    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-
+    const config = getConfig(argv)
     if (!argv.quiet) {
       console.log(banner)
     }
 
-    console.log('set environment; starting moneyd')
-    require('..')
+    console.log('starting moneyd')
+    moneyd.startFull(config, allowedOrigins).catch(onError)
   })
   .command('topup', 'pre-fund your balance with connector', {
     amount: {
@@ -91,59 +73,17 @@ require('yargs')
       default: 1000
     }
   }, argv => {
-    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG
-    }
-
-    if (!fs.existsSync(argv.config)) {
-      console.error('config file does not exist. file=' + argv.config)
-      process.exit(1)
-    }
-
-    const config = JSON.parse(fs.readFileSync(argv.config).toString())
-    process.env.BTP_NAME = config.name || ''
-    process.env.PARENT_BTP_HOST = config.parent || ''
-    process.env.XRP_SECRET = config.secret || ''
-    process.env.XRP_ADDRESS = config.address || ''
-    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-
-    console.log('set environment; starting moneyd')
-    require('./settle.js')
+    const config = getConfig(argv)
+    console.log('starting moneyd')
+    moneyd.settle(config, {amount: argv.amount}).then(done).catch(onError)
   })
   .command('cleanup', 'clean up unused payment channels', {}, argv => {
-    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG
-    }
-
-    if (!fs.existsSync(argv.config)) {
-      console.error('config file does not exist. file=' + argv.config)
-      process.exit(1)
-    }
-
-    const config = JSON.parse(fs.readFileSync(argv.config).toString())
-    process.env.XRP_SECRET = config.secret || ''
-    process.env.XRP_ADDRESS = config.address || ''
-    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-
-    require('./cleanup.js')
+    const config = getConfig(argv)
+    moneyd.cleanup(config).then(done).catch(onError)
   })
   .command('info', 'get info about your XRP account and payment channels', {}, argv => {
-    if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-      argv.config = DEFAULT_TESTNET_CONFIG
-    }
-
-    if (!fs.existsSync(argv.config)) {
-      console.error('config file does not exist. file=' + argv.config)
-      process.exit(1)
-    }
-
-    const config = JSON.parse(fs.readFileSync(argv.config).toString())
-    process.env.XRP_SECRET = config.secret || ''
-    process.env.XRP_ADDRESS = config.address || ''
-    process.env.XRP_SERVER = config.rippled || argv.rippled || ''
-    process.env.INFO_MODE = 'true'
-
-    require('./cleanup.js')
+    const config = getConfig(argv)
+    moneyd.info(config).then(done).catch(onError)
   })
   .command('configure', 'generate a configuration file', {
     parent: {
@@ -230,6 +170,32 @@ require('yargs')
   })
   .command('*', '', {}, argv => {
     console.error('unknown command.')
-    process.exit(0)
+    process.exit(1)
   })
   .argv
+
+function done () {
+  process.exit(0)
+}
+
+function onError (err) {
+  console.error('fatal:', err)
+  process.exit(1)
+}
+
+function getConfig (argv) {
+  if (argv.testnet && argv.config === DEFAULT_CONFIG) {
+    argv.config = DEFAULT_TESTNET_CONFIG
+  }
+
+  if (!fs.existsSync(argv.config)) {
+    console.error('config file does not exist. file=' + argv.config)
+    process.exit(1)
+  }
+
+  const configData = fs.readFileSync(argv.config).toString()
+  return new Config(Object.assign({
+    rippled: argv.rippled || 'wss://s1.ripple.com',
+    name: ''
+  }, JSON.parse(configData)))
+}
