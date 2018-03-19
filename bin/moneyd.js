@@ -134,6 +134,9 @@ require('yargs')
         argv.address = json.account.address
         argv.secret = json.account.secret
         console.log('got testnet address "' + argv.address + '"')
+
+        console.log('waiting for testnet API to fund address...')
+        await new Promise(resolve => setTimeout(resolve, 10000))
       }
     }
 
