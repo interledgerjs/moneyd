@@ -41,6 +41,10 @@ require('yargs')
     default: false,
     description: 'Whether to use the testnet config file'
   })
+  .option('admin-api-port', {
+    type: 'number',
+    description: 'Port on which to expose admin API (not exposed if unspecified)'
+  })
   .command('local', 'launch moneyd with no uplink into the network, for local testing', {}, argv => {
     console.log('launching local moneyd...')
     const allowedOrigins = []
@@ -199,6 +203,8 @@ function getConfig (argv) {
   const configData = fs.readFileSync(argv.config).toString()
   return new Config(Object.assign({
     rippled: argv.rippled || 'wss://s1.ripple.com',
+    environment: (argv.testnet ? 'test' : 'production'),
+    adminApiPort: argv['admin-api-port'],
     name: ''
   }, JSON.parse(configData)))
 }
