@@ -16,6 +16,9 @@ exports.startFull = (config, allowedOrigins) => Connector.createApp({
   backend: 'one-to-one',
   store: 'ilp-store-memory',
   initialConnectTimeout: 60000,
+  env: config.environment,
+  adminApi: !!config.adminApiPort,
+  adminApiPort: config.adminApiPort,
   accounts: {
     parent: {
       relation: 'parent',
@@ -48,11 +51,7 @@ exports.startFull = (config, allowedOrigins) => Connector.createApp({
         allowedOrigins
       }
     }
-  },
-  routes: [{
-    targetPrefix: 'g.',
-    peerId: 'parent'
-  }]
+  }
 }).listen()
 
 exports.startLocal = (allowedOrigins) => Connector.createApp({

@@ -14,6 +14,8 @@ class Config {
     this.xrpSecret = opts.secret
     this.xrpAddress = opts.address || deriveAddress(deriveKeypair(this.xrpSecret).publicKey)
     this.xrpServer = opts.rippled
+    this.environment = opts.environment
+    this.adminApiPort = opts.adminApiPort
     this.api = null
   }
 
