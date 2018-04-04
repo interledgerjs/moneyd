@@ -5,10 +5,11 @@ const fs = require('fs')
 const fetch = require('node-fetch')
 const Config = require('../src/config')
 const moneyd = require('../src')
+const HOME = require('os').homedir()
 const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
-const DEFAULT_CONFIG = path.join(process.env.HOME, '.moneyd.json')
-const DEFAULT_TESTNET_CONFIG = path.join(process.env.HOME, '.moneyd.test.json')
+const DEFAULT_CONFIG = path.join(HOME, '.moneyd.json')
+const DEFAULT_TESTNET_CONFIG = path.join(HOME, '.moneyd.test.json')
 const banner = chalk.green(`                                                                           88
                                                                            88
                                                                            88
