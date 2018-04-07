@@ -51,7 +51,10 @@ require('yargs')
     const allowedOrigins = []
       .concat(argv['allow-origin'] || [])
       .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
-    moneyd.startLocal(allowedOrigins).catch(onError)
+
+    moneyd.startLocal({
+      adminApiPort: argv.adminApiPort
+    }, allowedOrigins).catch(onError)
   })
   .command('start', 'launch moneyd', {
     quiet: {
