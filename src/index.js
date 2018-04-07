@@ -59,7 +59,7 @@ exports.startLocal = (allowedOrigins) => Connector.createApp({
   backend: 'one-to-one',
   store: 'ilp-store-memory',
   initialConnectTimeout: 60000,
-  ilpAddress: 'test.moneyd.',
+  ilpAddress: 'private.moneyd.',
   accounts: {
     local: {
       relation: 'child',
