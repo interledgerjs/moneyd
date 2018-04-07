@@ -54,10 +54,12 @@ exports.startFull = (config, allowedOrigins) => Connector.createApp({
   }
 }).listen()
 
-exports.startLocal = (allowedOrigins) => Connector.createApp({
+exports.startLocal = (config, allowedOrigins) => Connector.createApp({
   spread: 0,
   backend: 'one-to-one',
   store: 'ilp-store-memory',
+  adminApi: !!config.adminApiPort,
+  adminApiPort: config.adminApiPort,
   initialConnectTimeout: 60000,
   ilpAddress: 'private.moneyd.',
   accounts: {
