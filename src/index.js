@@ -61,7 +61,7 @@ exports.startLocal = (config, allowedOrigins) => Connector.createApp({
   adminApi: !!config.adminApiPort,
   adminApiPort: config.adminApiPort,
   initialConnectTimeout: 60000,
-  ilpAddress: 'private.moneyd.',
+  ilpAddress: 'private.moneyd',
   accounts: {
     local: {
       relation: 'child',
