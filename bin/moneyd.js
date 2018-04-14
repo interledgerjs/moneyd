@@ -10,6 +10,11 @@ const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
 const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
 const DEFAULT_CONFIG = path.join(HOME, '.moneyd.json')
 const DEFAULT_TESTNET_CONFIG = path.join(HOME, '.moneyd.test.json')
+const DEFAULT_ALLOWED_ORIGINS = [
+  // minute extension for web monetization
+  'chrome-extension://fakjpmebfmpdbhpnddiokemempckoejk'
+]
+
 const banner = chalk.green(`                                                                           88
                                                                            88
                                                                            88
@@ -48,7 +53,7 @@ require('yargs')
   })
   .command('local', 'launch moneyd with no uplink into the network, for local testing', {}, argv => {
     console.log('launching local moneyd...')
-    const allowedOrigins = []
+    const allowedOrigins = DEFAULT_ALLOWED_ORIGINS
       .concat(argv['allow-origin'] || [])
       .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
 
@@ -64,7 +69,7 @@ require('yargs')
       description: 'Don\'t print the banner on startup.'
     }
   }, argv => {
-    const allowedOrigins = []
+    const allowedOrigins = DEFAULT_ALLOWED_ORIGINS
       .concat(argv['allow-origin'] || [])
       .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
     const config = getConfig(argv)
