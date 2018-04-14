@@ -118,6 +118,11 @@ require('yargs')
       process.exit(1)
     }
 
+    if (fs.existsSync(argv.config)) {
+      console.error('config file already exists. file=' + argv.config)
+      process.exit(1)
+    }
+
     if (!argv.testnet && !argv.secret) {
       console.error('XRP secret must be specified (--secret)')
       process.exit(1)
