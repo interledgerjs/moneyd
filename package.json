@@ -15,6 +15,7 @@
     "ilp-connector": "interledgerjs/ilp-connector",
     "ilp-plugin-mini-accounts": "^3.3.1",
     "ilp-plugin-xrp-asym-client": "^1.1.4",
+    "ilp-plugin-xrp-paychan-shared": "^3.0.3",
     "ilp-store-memory": "^1.0.0",
     "inquirer": "^5.0.1",
     "moment": "^2.22.1",
