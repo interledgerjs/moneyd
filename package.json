@@ -17,6 +17,7 @@
     "ilp-plugin-xrp-asym-client": "^1.1.4",
     "ilp-store-memory": "^1.0.0",
     "inquirer": "^5.0.1",
+    "moment": "^2.22.1",
     "node-fetch": "^2.1.2",
     "yargs": "^10.1.1"
   },
