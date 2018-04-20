@@ -1,5 +1,6 @@
 'use strict'
 const inquirer = require('inquirer')
+const moment = require('moment')
 const table = require('good-table')
 const chalk = require('chalk')
 const Plugin = require('ilp-plugin-xrp-asym-client')
@@ -84,6 +85,23 @@ exports.startLocal = (config, allowedOrigins) => Connector.createApp({
   }
 }).listen()
 
+function formatChannelExpiration (exp) {
+  if (!exp) return ''
+  const unixExp = (exp + 0x386D4380) * 1000
+  if (unixExp <= Date.now()) return chalk.blue('ready to close')
+  return chalk.yellow('in ' + moment.duration(unixExp - Date.now()).humanize())
+}
+
+function formatChannelToRow (c, i) {
+  return [
+    String(i),
+    c.destination_account,
+    c.amount,
+    c.balance,
+    formatChannelExpiration(c.expiration)
+  ]
+}
+
 exports.info = async (config) => {
   const api = await config.rippleApi()
   console.log('getting account...')
@@ -101,10 +119,8 @@ exports.info = async (config) => {
       chalk.green('destination'),
       chalk.green('amount (drops)'),
       chalk.green('balance (drops)'),
-      chalk.green('closing') ],
-    ...channels.channels.map((c, i) =>
-      [ String(i), c.destination_account, c.amount, c.balance,
-        (c.expiration ? 'yes' : '')])
+      chalk.green('expiry') ],
+    ...channels.channels.map(formatChannelToRow)
   ])
   console.log(formatted)
 }
@@ -123,8 +139,8 @@ exports.cleanup = async (config) => {
     name: 'marked',
     message: 'which of these channels would you like to close?',
     choices: channels.channels.map((c, i) => {
-      return !c.expiration && String(i)
-    }).filter(e => e)
+      return String(i)
+    })
   })
 
   for (const index of result.marked) {
