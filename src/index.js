@@ -103,6 +103,7 @@ function formatChannelToRow (c, i) {
 }
 
 exports.info = async (config) => {
+  console.log('connecting to xrp ledger...')
   const api = await config.rippleApi()
   console.log('getting account...')
   const res = await api.getAccountInfo(config.xrpAddress)
@@ -128,7 +129,9 @@ exports.info = async (config) => {
 exports.cleanup = async (config) => {
   await exports.info(config)
   const api = await config.rippleApi()
+  const submitter = await config.submitter()
 
+  console.log('fetching channels...')
   const channels = await api.connection.request({
     command: 'account_channels',
     account: config.xrpAddress
@@ -145,17 +148,16 @@ exports.cleanup = async (config) => {
 
   for (const index of result.marked) {
     console.log('closing', index + '...')
-    const tx = await api.preparePaymentChannelClaim(config.xrpAddress, {
-      channel: channels.channels[index].channel_id,
-      close: true
-    })
-
-    const signedTx = api.sign(tx.txJSON, config.xrpSecret)
-    const {resultCode, resultMessage} = await api.submit(signedTx.signedTransaction)
-    if (resultCode !== 'tesSUCCESS') {
-      console.error('WARNING: Error submitting close: ', resultMessage)
+    try {
+      await submitter.submit('preparePaymentChannelClaim', {
+        channel: channels.channels[index].channel_id,
+        close: true
+      })
+    } catch (e) {
+      console.error('Warning:', e.message)
     }
   }
+
   console.log('closed!')
   process.exit(0)
 }
