@@ -221,13 +221,33 @@ moneyd info
 ### Clean Up Channels
 
 Sometimes you want to get your money back out of a payment channel. Moneyd
-provides a tool to do this. Expect it to take an hour for the channel to fully close;
-this gives the counterparty a chance to submit their best claim. Once the channel has
-fully expired your funds will be available again.
+provides a tool to do this.
+
+Closing a channel happens in two phases. First you mark the channel for closing.
+This sets an expiry on the channel. Next, once the expiry has passed, you can send another
+close transaction to get your funds back and delete the channel.
+
+To mark channels for closing, run:
 
 ```
 moneyd cleanup
 ```
+
+Select the channels you'd like to close with `<space>` and then hit `<enter>`.
+If you run `moneyd info` you'll see that the channels now have expiries set.
+
+Expect it to take an hour for the channel to be ready for closing; this gives
+the counterparty a chance to submit their best claim.
+
+Once the hour is up, run cleanup again:
+
+```
+moneyd cleanup
+```
+
+This time, the channels should say `ready to close`. Mark them for closing, and
+this time they'll go away for good. Your XRP account will be credited the total channel
+capacity minus the current channel balance.
 
 If you start moneyd and its previous channel is closing or closed, it will
 automatically open a fresh channel.
