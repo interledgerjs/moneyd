@@ -1,6 +1,7 @@
 'use strict'
 const crypto = require('crypto')
 const { deriveAddress, deriveKeypair } = require('ripple-keypairs')
+const { createSubmitter } = require('ilp-plugin-xrp-paychan-shared')
 const { RippleAPI } = require('ripple-lib')
 const parentBtpHmacKey = 'parent_btp_uri'
 
@@ -17,6 +18,7 @@ class Config {
     this.environment = opts.environment
     this.adminApiPort = opts.adminApiPort
     this.api = null
+    this.subscribed = false
   }
 
   xrpPluginOptions () {
@@ -37,6 +39,20 @@ class Config {
       await this.api.connect()
     }
     return this.api
+  }
+
+  async submitter () {
+    const api = await this.rippleApi()
+
+    if (!this.subscribed) {
+      this.subscribed = true
+      await api.connection.request({
+        command: 'subscribe',
+        accounts: [ this.xrpAddress ]
+      })
+    }
+
+    return createSubmitter(api, this.xrpAddress, this.xrpSecret)
   }
 }
 
