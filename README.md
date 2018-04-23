@@ -12,7 +12,7 @@
 - [Advanced Usage](#usage)
   - [Command-Line Options](#command-line-options)
   - [Remote Deploy](#remote-deploy)
-  - [Reconciliation](#settlement)
+  - [Reconciliation](#reconciliation)
   - [Account Info](#account-info)
   - [Clean Up Channels](#clean-up-channels)
   - [Multiple Instances](#multiple-instances)
