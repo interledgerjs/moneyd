@@ -6,6 +6,7 @@
   - [Live Network](#live-network)
   - [Local Test Network](#local-test-network)
 - [Description](#description)
+- [Uplinks](#uplinks)
 - [Writing ILP Applications](#writing-ilp-applications)
   - [Making an SPSP Payment](#making-an-spsp-payment)
   - [How Does "ilp-plugin" Work?](#how-does-ilp-plugin-work)
@@ -100,6 +101,15 @@ other tools will work right out of the box.
 
 Because it's in early stages, don't use it
 with a ripple account that has too much money.
+
+## Uplinks
+
+An uplink module wraps ILP plugins for Moneyd's use. They provide additional features such as payment channel management and configuration construction. At least one uplink must be installed to use Moneyd.
+
+Example uplink modules:
+
+  * [moneyd-uplink-xrp](https://github.com/interledgerjs/moneyd-uplink-xrp)
+  * (more to come)
 
 ## Writing ILP Applications
 
