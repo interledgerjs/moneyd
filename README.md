@@ -33,9 +33,9 @@ You'll need:
 - Permissions to install global node modules.
 
 ```sh
-npm install -g moneyd
-moneyd configure --testnet
-moneyd start --testnet
+npm install -g moneyd moneyd-uplink-xrp
+moneyd --testnet configure xrp
+moneyd --testnet start
 ```
 
 Give it a minute to initialize a channel, then you're done! A configuration
@@ -56,8 +56,8 @@ You'll need:
 Just run:
 
 ```sh
-npm install -g moneyd
-moneyd configure --secret YOUR_XRP_SECRET
+npm install -g moneyd moneyd-uplink-xrp
+moneyd configure xrp
 moneyd start
 ```
 
@@ -257,16 +257,28 @@ automatically open a fresh channel.
 Sometimes you want to run several instances of moneyd with for the same XRP
 account and parent connector.
 
-In order to distinguish your instances of moneyd, set (or change) the `"name"`
+In order to distinguish your instances of moneyd, set (or change) the `"uplinks.xrp.options.name"`
 field in your `~/.moneyd.json`. This `"name"` will be a segment of your ILP
 address, so it must only use `[A-Za-z0-9\-_~]`. The `"name"` must be unique per
 parent BTP host.
 
 ```json
 {
-  "secret": "your_xrp_secret",
-  "parent": "your_parent_host",
-  "name": "example-user"
+  "version": 1,
+  "currentUplink": "xrp",
+  "uplinks": {
+    "xrp": {
+      ...
+      "options": {
+        "server": "your_parent_host",
+        "secret": "your_xrp_secret",
+        "address": "your_xrp_address",
+        "xrpServer": "your_xrp_server",
+        "name": "example-user"
+      }
+    }
+    ...
+  }
 }
 ```
 

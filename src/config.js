@@ -1,58 +1,77 @@
 'use strict'
+const fs = require('fs')
 const crypto = require('crypto')
-const { deriveAddress, deriveKeypair } = require('ripple-keypairs')
-const { createSubmitter } = require('ilp-plugin-xrp-paychan-shared')
-const { RippleAPI } = require('ripple-lib')
-const parentBtpHmacKey = 'parent_btp_uri'
 
 class Config {
-  constructor (opts) {
-    if (!opts.parent || !opts.secret) {
-      throw new Error('--parent and --secret must be defined')
-    }
-    this.btpName = opts.name
-    this.parentBtpHost = opts.parent
-    this.xrpSecret = opts.secret
-    this.xrpAddress = opts.address || deriveAddress(deriveKeypair(this.xrpSecret).publicKey)
-    this.xrpServer = opts.rippled
-    this.environment = opts.environment
-    this.adminApiPort = opts.adminApiPort
-    this.api = null
-    this.subscribed = false
-  }
+  constructor (file) {
+    this.file = file
+    this.data = fs.existsSync(file)
+      ? JSON.parse(fs.readFileSync(file).toString())
+      : { version: 1, currentUplink: null, uplinks: {} }
 
-  xrpPluginOptions () {
-    // TODO: wss
-    const btpSecret = hmac(hmac(parentBtpHmacKey, this.parentBtpHost + this.btpName), this.xrpSecret).toString('hex')
-    const parentUri = 'btp+wss://' + this.btpName + ':' + btpSecret + '@' + this.parentBtpHost
-    return {
-      server: parentUri,
-      secret: this.xrpSecret,
-      address: this.xrpAddress,
-      xrpServer: this.xrpServer
+    // Deprecated config format: assume XRP.
+    if (this.data.version === undefined) {
+      this.data = version0To1(this.data)
     }
   }
 
-  async rippleApi () {
-    if (!this.api) {
-      this.api = new RippleAPI({ server: this.xrpServer })
-      await this.api.connect()
-    }
-    return this.api
+  getData () {
+    return this.data
   }
 
-  async submitter () {
-    const api = await this.rippleApi()
+  getCurrentUplink () {
+    return this.data.currentUplink
+  }
 
-    if (!this.subscribed) {
-      this.subscribed = true
-      await api.connection.request({
-        command: 'subscribe',
-        accounts: [ this.xrpAddress ]
-      })
+  setCurrentUplink (uplink) {
+    if (!this.data.uplinks[uplink]) {
+      throw new Error('no configuration available for uplink=' + uplink + ' in file=' + this.file)
     }
+    this.data.currentUplink = uplink
+    this._write()
+  }
 
-    return createSubmitter(api, this.xrpAddress, this.xrpSecret)
+  getUplinkData (uplink) {
+    return this.data.uplinks[uplink]
+  }
+
+  setUplinkData (uplink, data) {
+    this.data.uplinks[uplink] = data
+    this._write()
+  }
+
+  _write () {
+    fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2))
+  }
+}
+
+function version0To1 (oldData) {
+  const btpName = oldData.name || ''
+  const btpSecret = hmac(hmac('parent_btp_uri', oldData.parent + btpName), oldData.secret).toString('hex')
+  const parentUri = 'btp+wss://' + btpName + ':' + btpSecret + '@' + oldData.parent
+  return {
+    version: 1,
+    currentUplink: 'xrp',
+    uplinks: {
+      xrp: {
+        relation: 'parent',
+        plugin: 'moneyd-uplink-xrp/node_modules/ilp-plugin-xrp-asym-client',
+        assetCode: 'XRP',
+        assetScale: 6,
+        balance: {
+          minimum: '-Infinity',
+          maximum: '20000',
+          settleThreshold: '5000',
+          settleTo: '10000'
+        },
+        options: {
+          server: parentUri,
+          secret: oldData.secret,
+          address: oldData.address,
+          xrpServer: oldData.rippled
+        }
+      }
+    }
   }
 }
 
