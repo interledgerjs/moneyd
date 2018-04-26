@@ -330,3 +330,4 @@ find more use cases.
 (Submit a PR to add your own connector here)
 
 - `client.scyl.la` - N. Virginia
+- `ilsp.openafricanetwork.org` - W. Europe (waiting for AWS to host instances in Africa...)
