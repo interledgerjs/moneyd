@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 const chalk = require('chalk')
 const path = require('path')
-const fs = require('fs')
 const Moneyd = require('../src')
+const Config = require('../src/config')
 const HOME = require('os').homedir()
 const DEFAULT_CONFIG = path.join(HOME, '.moneyd.json')
 const DEFAULT_TESTNET_CONFIG = path.join(HOME, '.moneyd.test.json')
@@ -17,8 +17,7 @@ const banner = chalk.green(`                                                    
                                                           d8'
                                                          d8'`)
 
-// eslint-disable-next-line no-unused-expressions
-require('yargs')
+const yargs = require('yargs')
   .option('config', {
     alias: 'c',
     default: DEFAULT_CONFIG,
@@ -46,60 +45,81 @@ require('yargs')
 
   .command('local', 'Launch moneyd with no uplink into the network, for local testing', {}, argv => {
     console.log('launching local moneyd...')
-    const moneyd = getMoneyd(argv)
+    const moneyd = new Moneyd(argv)
     moneyd.startLocal().catch(onError)
   })
 
-  .command('start', 'Launch moneyd', {
-    quiet: {
-      alias: 'q',
-      type: 'boolean',
-      default: false,
-      description: 'Don\'t print the banner on startup.'
+Object.keys(Moneyd.uplinks).forEach((uplinkName) => {
+  yargs.command({
+    command: uplinkName + ':configure',
+    describe: 'Generate a configuration file',
+    builder: {
+      advanced: {
+        type: 'boolean',
+        default: false,
+        description: 'Set to specify extra config fields'
+      }
+    },
+    handler: (argv) => {
+      argv.config = getConfigFile(argv)
+      Moneyd.buildConfig(uplinkName, argv).then(done).catch(onError)
     }
-  }, argv => {
-    if (!argv.quiet) {
-      console.log(banner)
+  })
+
+  const uplink = Moneyd.uplinks[uplinkName]
+  if (!uplink) return
+  addUplinkCommand(uplinkName, {
+    command: 'start',
+    describe: 'Launch moneyd',
+    builder: {
+      quiet: {
+        alias: 'q',
+        type: 'boolean',
+        default: false,
+        description: 'Don\'t print the banner on startup.'
+      }
+    },
+    handler: async (config, argv) => {
+      if (!argv.quiet) {
+        console.log(banner)
+      }
+      console.log('starting moneyd')
+      const moneyd = new Moneyd(argv)
+      await moneyd.startConnector(config)
     }
-    console.log('starting moneyd')
-    const moneyd = getMoneyd(argv)
-    moneyd.startConnector().catch(onError)
   })
 
-  .command('topup', 'Pre-fund your balance with connector', {
-    amount: {
-      description: 'amount to send to connector',
-      demandOption: true
-    }
-  }, argv => {
-    const moneyd = getMoneyd(argv)
-    moneyd.settle({amount: argv.amount}).then(done).catch(onError)
+  uplink.commands.forEach((cmd) => {
+    addUplinkCommand(uplinkName, Object.assign({}, cmd, {
+      handler: (config, argv) => cmd.handler(config, argv).then(done)
+    }))
   })
+})
 
-  .command('cleanup', 'Clean up unused payment channels', {}, argv => {
-    const moneyd = getMoneyd(argv)
-    moneyd.cleanupChannels().then(done).catch(onError)
-  })
-
-  .command('info', 'Get info about your XRP account and payment channels', {}, argv => {
-    const moneyd = getMoneyd(argv)
-    moneyd.printChannels().then(done).catch(onError)
-  })
-
-  .command('configure <uplink>', 'Generate a configuration file', {}, (argv) => {
-    Moneyd.buildConfig(argv.uplink, parseArgv(argv)).then(done).catch(onError)
-  })
-
-  .command('use <uplink>', 'Set current uplink', {}, (argv) => {
-    const moneyd = getMoneyd(argv)
-    moneyd.setCurrentUplink(argv.uplink)
-  })
-
+// eslint-disable-next-line no-unused-expressions
+yargs
   .command('*', '', {}, argv => {
     console.error('unknown command.')
     process.exit(1)
   })
   .argv
+
+function addUplinkCommand (uplinkName, cmd) {
+  yargs.command({
+    command: uplinkName + ':' + cmd.command,
+    describe: cmd.describe,
+    builder: cmd.builder,
+    handler: (argv) => {
+      const config = new Config(getConfigFile(argv))
+      const uplinkData = config.getUplinkData(uplinkName)
+      if (!uplinkData) {
+        console.error('No configuration found for uplink=' + uplinkName + ' mode=' + (argv.testnet ? 'testnet' : 'prod'))
+        process.exit(1)
+      }
+      cmd.handler(uplinkData, argv).catch(onError)
+    }
+  })
+}
 
 function done () {
   process.exit(0)
@@ -110,25 +130,9 @@ function onError (err) {
   process.exit(1)
 }
 
-function parseArgv (argv) {
+function getConfigFile (argv) {
   if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-    argv.config = DEFAULT_TESTNET_CONFIG
+    return DEFAULT_TESTNET_CONFIG
   }
-  return {
-    config: argv.config,
-    allowOrigin: argv['allow-origin'],
-    allowExtensions: argv['unsafe-allow-extensions'],
-    environment: argv.testnet ? 'test' : 'production',
-    adminApiPort: argv['admin-api-port'],
-    testnet: argv.testnet
-  }
-}
-
-function getMoneyd (argv) {
-  const args = parseArgv(argv)
-  if (!fs.existsSync(args.config)) {
-    console.error('config file does not exist. file=' + args.config)
-    process.exit(1)
-  }
-  return new Moneyd(args.config, args)
+  return argv.config
 }

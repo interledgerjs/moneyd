@@ -7,7 +7,7 @@ class Config {
     this.file = file
     this.data = fs.existsSync(file)
       ? JSON.parse(fs.readFileSync(file).toString())
-      : { version: 1, currentUplink: null, uplinks: {} }
+      : { version: 1, uplinks: {} }
 
     // Deprecated config format: assume XRP.
     if (this.data.version === undefined) {
@@ -15,32 +15,12 @@ class Config {
     }
   }
 
-  getData () {
-    return this.data
-  }
-
-  getCurrentUplink () {
-    return this.data.currentUplink
-  }
-
-  setCurrentUplink (uplink) {
-    if (!this.data.uplinks[uplink]) {
-      throw new Error('no configuration available for uplink=' + uplink + ' in file=' + this.file)
-    }
-    this.data.currentUplink = uplink
-    this._write()
-  }
-
   getUplinkData (uplink) {
     return this.data.uplinks[uplink]
   }
 
-  setUplinkData (uplink, data) {
-    this.data.uplinks[uplink] = data
-    this._write()
-  }
-
-  _write () {
+  setUplinkData (uplink, uplinkData) {
+    this.data.uplinks[uplink] = uplinkData
     fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2))
   }
 }
@@ -51,7 +31,6 @@ function version0To1 (oldData) {
   const parentUri = 'btp+wss://' + btpName + ':' + btpSecret + '@' + oldData.parent
   return {
     version: 1,
-    currentUplink: 'xrp',
     uplinks: {
       xrp: {
         relation: 'parent',

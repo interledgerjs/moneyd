@@ -35,8 +35,8 @@ You'll need:
 
 ```sh
 npm install -g moneyd moneyd-uplink-xrp
-moneyd --testnet configure xrp
-moneyd --testnet start
+moneyd --testnet xrp:configure
+moneyd --testnet xrp:start
 ```
 
 Give it a minute to initialize a channel, then you're done! A configuration
@@ -58,8 +58,8 @@ Just run:
 
 ```sh
 npm install -g moneyd moneyd-uplink-xrp
-moneyd configure xrp
-moneyd start
+moneyd xrp:configure
+moneyd xrp:start
 ```
 
 Your XRP secret (or "seed") is the base58-encoded string that starts with an 's'.
@@ -185,7 +185,7 @@ moneyd help
 If you want to see the options for a specific command, pass `--help`. For example:
 
 ```
-moneyd configure --help
+moneyd xrp:configure --help
 ```
 
 ### Remote Deploy
@@ -212,7 +212,7 @@ you owe it money, and refusing to forward any of your packets.
 To fix this, just stop moneyd and run:
 
 ```
-moneyd topup --amount 1000
+moneyd xrp:topup --amount 1000
 ```
 
 You can adjust the amount if you need to reconcile more. The amount is
@@ -225,7 +225,7 @@ You can get information about your XRP account's balance and outstanding
 payment channels. To access this information, run:
 
 ```
-moneyd info
+moneyd xrp:info
 ```
 
 ### Clean Up Channels
@@ -240,11 +240,11 @@ close transaction to get your funds back and delete the channel.
 To mark channels for closing, run:
 
 ```
-moneyd cleanup
+moneyd xrp:cleanup
 ```
 
 Select the channels you'd like to close with `<space>` and then hit `<enter>`.
-If you run `moneyd info` you'll see that the channels now have expiries set.
+If you run `moneyd xrp:info` you'll see that the channels now have expiries set.
 
 Expect it to take an hour for the channel to be ready for closing; this gives
 the counterparty a chance to submit their best claim.
@@ -252,7 +252,7 @@ the counterparty a chance to submit their best claim.
 Once the hour is up, run cleanup again:
 
 ```
-moneyd cleanup
+moneyd xrp:cleanup
 ```
 
 This time, the channels should say `ready to close`. Mark them for closing, and
@@ -272,13 +272,13 @@ field in your `~/.moneyd.json`. This `"name"` will be a segment of your ILP
 address, so it must only use `[A-Za-z0-9\-_~]`. The `"name"` must be unique per
 parent BTP host.
 
-```json
+```javascript
 {
   "version": 1,
   "currentUplink": "xrp",
   "uplinks": {
     "xrp": {
-      ...
+      // ...
       "options": {
         "server": "your_parent_host",
         "secret": "your_xrp_secret",
@@ -287,7 +287,7 @@ parent BTP host.
         "name": "example-user"
       }
     }
-    ...
+    // ...
   }
 }
 ```

@@ -1,6 +1,5 @@
 'use strict'
 const Connector = require('ilp-connector')
-const inquirer = require('inquirer')
 const Config = require('./config')
 
 const DEFAULT_ALLOWED_ORIGINS = [
@@ -8,30 +7,29 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'chrome-extension://fakjpmebfmpdbhpnddiokemempckoejk'
 ]
 
-const uplinkModules = {
-  xrp: 'moneyd-uplink-xrp'
-  // eth: 'moneyd-uplink-eth',
-  // btp: 'moneyd-uplink-btp'
+const uplinks = {
+  xrp: maybeRequire('moneyd-uplink-xrp')
+  // eth: maybeRequire('moneyd-uplink-eth'),
+  // btp: maybeRequire('moneyd-uplink-btp')
+}
+
+function maybeRequire (pkg) {
+  try {
+    return require(pkg)
+  } catch (err) {
+    if (err.code !== 'MODULE_NOT_FOUND') throw err
+    return null
+  }
 }
 
 class Moneyd {
-  constructor (file, {
-    allowOrigin,
-    allowExtensions,
-    environment,
-    adminApiPort
-  }) {
+  constructor (argv) {
     const allowedOrigins = DEFAULT_ALLOWED_ORIGINS
-      .concat(allowOrigin || [])
-      .concat(allowExtensions ? 'chrome-extension://.*' : [])
+      .concat(argv['allow-origin'] || [])
+      .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
     this.allowedOrigins = allowedOrigins
-    this.environment = environment
-    this.adminApiPort = adminApiPort
-    this.config = new Config(file)
-
-    const currentUplink = this.config.getCurrentUplink()
-    const Uplink = getUplink(currentUplink)
-    this.uplink = new Uplink(this.config.getUplinkData(currentUplink))
+    this.environment = argv.testnet ? 'test' : 'production'
+    this.adminApiPort = argv['admin-api-port']
   }
 
   static async buildConfig (uplinkName, argv) {
@@ -40,13 +38,11 @@ class Moneyd {
       throw new Error('config already exists for uplinkName=' + uplinkName + ' file=' + argv.config)
     }
 
-    const Uplink = getUplink(uplinkName)
-    const uplinkData = await Uplink.buildConfig(inquirer, argv)
-    config.setUplinkData(uplinkName, uplinkData)
-    config.setCurrentUplink(uplinkName)
+    const uplink = getUplink(uplinkName)
+    config.setUplinkData(uplinkName, await uplink.configure(argv))
   }
 
-  startConnector () {
+  startConnector (uplinkData) {
     return Connector.createApp({
       spread: 0,
       backend: 'one-to-one',
@@ -56,7 +52,7 @@ class Moneyd {
       adminApi: !!this.adminApiPort,
       adminApiPort: this.adminApiPort,
       accounts: {
-        parent: this.config.getUplinkData(this.config.getCurrentUplink()),
+        parent: uplinkData,
         local: {
           relation: 'child',
           plugin: 'ilp-plugin-mini-accounts',
@@ -105,51 +101,12 @@ class Moneyd {
       }
     }).listen()
   }
-
-  setCurrentUplink (uplinkName) {
-    validateUplink(uplinkName)
-    this.config.setCurrentUplink(uplinkName)
-  }
-
-  async settle ({amount}) {
-    const plugin = this.uplink.getPlugin()
-    await plugin.connect()
-    await plugin.sendMoney(amount)
-  }
-
-  async printChannels () {
-    const channels = await this.uplink.listChannels()
-    if (!channels.length) return console.error('No channels found')
-    await this.uplink.printChannels(channels)
-  }
-
-  async cleanupChannels () {
-    const channels = await this.uplink.listChannels()
-    if (!channels.length) return console.error('No channels found')
-    await this.uplink.printChannels(channels)
-    const result = await inquirer.prompt({
-      type: 'checkbox',
-      name: 'marked',
-      message: 'Select channels to close:',
-      choices: channels.map((_, i) => i.toString())
-    })
-    await this.uplink.cleanupChannels(
-      result.marked.map((index) => channels[+index]))
-  }
 }
 
-function validateUplink (uplinkName) { getUplink(uplinkName) }
-
 function getUplink (uplinkName) {
-  const module = uplinkModules[uplinkName]
-  if (!module) {
-    console.error('Unknown uplink: "' + uplinkName + '"')
-    process.exit(1)
-  }
-  try {
-    return require(module)
-  } catch (err) {
-    if (err.code !== 'MODULE_NOT_FOUND') throw err
+  const uplink = uplinks[uplinkName]
+  if (uplink) return uplink
+  if (uplink === null) {
     console.error('Missing required plugin. To install, run:')
     console.error('')
     console.error('  $ npm install -g ' + module)
@@ -157,6 +114,11 @@ function getUplink (uplinkName) {
     console.error('assuming moneyd was also installed globally.')
     process.exit(1)
   }
+  if (uplink === undefined) {
+    console.error('Unknown uplink: "' + uplinkName + '"')
+    process.exit(1)
+  }
 }
 
+Moneyd.uplinks = uplinks
 module.exports = Moneyd
