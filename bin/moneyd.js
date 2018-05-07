@@ -1,20 +1,11 @@
 #!/usr/bin/env node
 const chalk = require('chalk')
 const path = require('path')
-const fs = require('fs')
-const fetch = require('node-fetch')
+const Moneyd = require('../src')
 const Config = require('../src/config')
-const moneyd = require('../src')
 const HOME = require('os').homedir()
-const DEFAULT_RIPPLED = 'wss://s1.ripple.com'
-const DEFAULT_TESTNET_RIPPLED = 'wss://s.altnet.rippletest.net:51233'
 const DEFAULT_CONFIG = path.join(HOME, '.moneyd.json')
 const DEFAULT_TESTNET_CONFIG = path.join(HOME, '.moneyd.test.json')
-const DEFAULT_ALLOWED_ORIGINS = [
-  // minute extension for web monetization
-  'chrome-extension://fakjpmebfmpdbhpnddiokemempckoejk'
-]
-
 const banner = chalk.green(`                                                                           88
                                                                            88
                                                                            88
@@ -26,7 +17,7 @@ const banner = chalk.green(`                                                    
                                                           d8'
                                                          d8'`)
 
-require('yargs')
+const yargs = require('yargs')
   .option('config', {
     alias: 'c',
     default: DEFAULT_CONFIG,
@@ -51,149 +42,84 @@ require('yargs')
     type: 'number',
     description: 'Port on which to expose admin API (not exposed if unspecified)'
   })
-  .command('local', 'launch moneyd with no uplink into the network, for local testing', {}, argv => {
+
+  .command('local', 'Launch moneyd with no uplink into the network, for local testing', {}, argv => {
     console.log('launching local moneyd...')
-    const allowedOrigins = DEFAULT_ALLOWED_ORIGINS
-      .concat(argv['allow-origin'] || [])
-      .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
-
-    moneyd.startLocal({
-      adminApiPort: argv.adminApiPort
-    }, allowedOrigins).catch(onError)
+    const moneyd = new Moneyd(argv)
+    moneyd.startLocal().catch(onError)
   })
-  .command('start', 'launch moneyd', {
-    quiet: {
-      alias: 'q',
-      type: 'boolean',
-      default: false,
-      description: 'Don\'t print the banner on startup.'
-    }
-  }, argv => {
-    const allowedOrigins = DEFAULT_ALLOWED_ORIGINS
-      .concat(argv['allow-origin'] || [])
-      .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
-    const config = getConfig(argv)
-    if (!argv.quiet) {
-      console.log(banner)
-    }
 
-    console.log('starting moneyd')
-    moneyd.startFull(config, allowedOrigins).catch(onError)
-  })
-  .command('topup', 'pre-fund your balance with connector', {
-    amount: {
-      description: 'amount (in drops) to send to connector',
-      default: 1000
-    }
-  }, argv => {
-    const config = getConfig(argv)
-    console.log('starting moneyd')
-    moneyd.settle(config, {amount: argv.amount}).then(done).catch(onError)
-  })
-  .command('cleanup', 'clean up unused payment channels', {}, argv => {
-    const config = getConfig(argv)
-    moneyd.cleanup(config).then(done).catch(onError)
-  })
-  .command('info', 'get info about your XRP account and payment channels', {}, argv => {
-    const config = getConfig(argv)
-    moneyd.info(config).then(done).catch(onError)
-  })
-  .command('configure', 'generate a configuration file', {
-    parent: {
-      description: 'BTP host of your parent connector, e.g. "client.scyl.la"'
-    },
-    secret: {
-      description: 'XRP secret, "s..."'
-    },
-    address: {
-      description: 'XRP address. Can be derived from secret.',
-      default: ''
-    },
-    rippled: {
-      default: 'wss://s1.ripple.com',
-      description: 'Rippled server. Uses S1 server provided by Ripple by default.'
-    },
-    name: {
-      default: '',
-      description: 'Name to assign to this channel. Must be changed if other parameters are changed.'
-    }
-  }, async argv => {
-    if (!argv.config) {
-      console.error('config file to output must be specified (--config)')
-      process.exit(1)
-    }
-
-    if (fs.existsSync(argv.config)) {
-      console.error('config file already exists. file=' + argv.config)
-      process.exit(1)
-    }
-
-    if (!argv.testnet && !argv.secret) {
-      console.error('XRP secret must be specified (--secret)')
-      process.exit(1)
-    }
-
-    if (argv.testnet) {
-      if (argv.rippled === DEFAULT_RIPPLED) {
-        console.log('setting testnet rippled server...')
-        argv.rippled = DEFAULT_TESTNET_RIPPLED
+Object.keys(Moneyd.uplinks).forEach((uplinkName) => {
+  yargs.command({
+    command: uplinkName + ':configure',
+    describe: 'Generate a configuration file',
+    builder: {
+      advanced: {
+        type: 'boolean',
+        default: false,
+        description: 'Set to specify extra config fields'
       }
-
-      if (argv.config === DEFAULT_CONFIG) {
-        console.log('setting config file location to ' + DEFAULT_TESTNET_CONFIG)
-        argv.config = DEFAULT_TESTNET_CONFIG
-      }
-
-      if (!argv.secret) {
-        console.log('acquiring testnet account...')
-        const res = await fetch('https://faucet.altnet.rippletest.net/accounts', { method: 'POST' })
-        const json = await res.json()
-
-        argv.address = json.account.address
-        argv.secret = json.account.secret
-        console.log('got testnet address "' + argv.address + '"')
-
-        console.log('waiting for testnet API to fund address...')
-        await new Promise(resolve => setTimeout(resolve, 10000))
-      }
+    },
+    handler: (argv) => {
+      argv.config = getConfigFile(argv)
+      Moneyd.buildConfig(uplinkName, argv).then(done).catch(onError)
     }
-
-    if (fs.existsSync(argv.config)) {
-      console.error('config file already exists. file=' + argv.config)
-      process.exit(1)
-    }
-
-    if (!argv.parent) {
-      console.log('selecting a parent from connector list...')
-    }
-
-    const list = require('../connector_list.json')
-    const servers = list[argv.testnet ? 'test' : 'live']
-    const parent = argv.parent || servers[Math.floor(Math.random() * servers.length)]
-
-    const config = {
-      secret: argv.secret,
-      rippled: argv.rippled,
-      parent
-    }
-
-    if (argv.name) {
-      config.name = argv.name
-    }
-
-    if (argv.address) {
-      config.address = argv.address
-    }
-
-    console.log('writing config file...')
-    fs.writeFileSync(argv.config, JSON.stringify(config, null, 2))
-    console.log('written to', argv.config)
   })
+
+  const uplink = Moneyd.uplinks[uplinkName]
+  if (!uplink) return
+  addUplinkCommand(uplinkName, {
+    command: 'start',
+    describe: 'Launch moneyd',
+    builder: {
+      quiet: {
+        alias: 'q',
+        type: 'boolean',
+        default: false,
+        description: 'Don\'t print the banner on startup.'
+      }
+    },
+    handler: async (config, argv) => {
+      if (!argv.quiet) {
+        console.log(banner)
+      }
+      console.log('starting moneyd')
+      const moneyd = new Moneyd(argv)
+      await moneyd.startConnector(config)
+    }
+  })
+
+  uplink.commands.forEach((cmd) => {
+    addUplinkCommand(uplinkName, Object.assign({}, cmd, {
+      handler: (config, argv) => cmd.handler(config, argv).then(done)
+    }))
+  })
+})
+
+// eslint-disable-next-line no-unused-expressions
+yargs
   .command('*', '', {}, argv => {
     console.error('unknown command.')
     process.exit(1)
   })
   .argv
+
+function addUplinkCommand (uplinkName, cmd) {
+  yargs.command({
+    command: uplinkName + ':' + cmd.command,
+    describe: cmd.describe,
+    builder: cmd.builder,
+    handler: (argv) => {
+      const config = new Config(getConfigFile(argv))
+      const uplinkData = config.getUplinkData(uplinkName)
+      if (!uplinkData) {
+        console.error('No configuration found for uplink=' + uplinkName + ' mode=' + (argv.testnet ? 'testnet' : 'prod'))
+        process.exit(1)
+      }
+      cmd.handler(uplinkData, argv).catch(onError)
+    }
+  })
+}
 
 function done () {
   process.exit(0)
@@ -204,21 +130,9 @@ function onError (err) {
   process.exit(1)
 }
 
-function getConfig (argv) {
+function getConfigFile (argv) {
   if (argv.testnet && argv.config === DEFAULT_CONFIG) {
-    argv.config = DEFAULT_TESTNET_CONFIG
+    return DEFAULT_TESTNET_CONFIG
   }
-
-  if (!fs.existsSync(argv.config)) {
-    console.error('config file does not exist. file=' + argv.config)
-    process.exit(1)
-  }
-
-  const configData = fs.readFileSync(argv.config).toString()
-  return new Config(Object.assign({
-    rippled: argv.rippled || 'wss://s1.ripple.com',
-    environment: (argv.testnet ? 'test' : 'production'),
-    adminApiPort: argv['admin-api-port'],
-    name: ''
-  }, JSON.parse(configData)))
+  return argv.config
 }

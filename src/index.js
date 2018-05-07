@@ -1,163 +1,124 @@
 'use strict'
-const inquirer = require('inquirer')
-const moment = require('moment')
-const table = require('good-table')
-const chalk = require('chalk')
-const Plugin = require('ilp-plugin-xrp-asym-client')
 const Connector = require('ilp-connector')
+const Config = require('./config')
 
-exports.settle = async (config, {amount}) => {
-  const plugin = new Plugin(config.xrpPluginOptions())
-  await plugin.connect()
-  await plugin.sendMoney(amount)
+const DEFAULT_ALLOWED_ORIGINS = [
+  // minute extension for web monetization
+  'chrome-extension://fakjpmebfmpdbhpnddiokemempckoejk'
+]
+
+const uplinks = {
+  xrp: maybeRequire('moneyd-uplink-xrp')
+  // eth: maybeRequire('moneyd-uplink-eth'),
+  // btp: maybeRequire('moneyd-uplink-btp')
 }
 
-exports.startFull = (config, allowedOrigins) => Connector.createApp({
-  spread: 0,
-  backend: 'one-to-one',
-  store: 'ilp-store-memory',
-  initialConnectTimeout: 60000,
-  env: config.environment,
-  adminApi: !!config.adminApiPort,
-  adminApiPort: config.adminApiPort,
-  accounts: {
-    parent: {
-      relation: 'parent',
-      plugin: 'ilp-plugin-xrp-asym-client',
-      assetCode: 'XRP',
-      assetScale: 6,
-      balance: {
-        minimum: '-Infinity',
-        maximum: '20000',
-        settleThreshold: '5000',
-        settleTo: '10000'
-      },
-      options: config.xrpPluginOptions()
-    },
-    local: {
-      relation: 'child',
-      plugin: 'ilp-plugin-mini-accounts',
-      assetCode: 'XRP',
-      assetScale: 6,
-      balance: {
-        minimum: '-Infinity',
-        maximum: 'Infinity',
-        settleThreshold: '-Infinity'
-      },
-      options: {
-        wsOpts: {
-          host: 'localhost',
-          port: 7768
-        },
-        allowedOrigins
+function maybeRequire (pkg) {
+  try {
+    return require(pkg)
+  } catch (err) {
+    if (err.code !== 'MODULE_NOT_FOUND') throw err
+    return null
+  }
+}
+
+class Moneyd {
+  constructor (argv) {
+    const allowedOrigins = DEFAULT_ALLOWED_ORIGINS
+      .concat(argv['allow-origin'] || [])
+      .concat(argv['unsafe-allow-extensions'] ? 'chrome-extension://.*' : [])
+    this.allowedOrigins = allowedOrigins
+    this.environment = argv.testnet ? 'test' : 'production'
+    this.adminApiPort = argv['admin-api-port']
+  }
+
+  static async buildConfig (uplinkName, argv) {
+    const config = new Config(argv.config)
+    if (config.getUplinkData(uplinkName)) {
+      throw new Error('config already exists for uplinkName=' + uplinkName + ' file=' + argv.config)
+    }
+
+    const uplink = getUplink(uplinkName)
+    config.setUplinkData(uplinkName, await uplink.configure(argv))
+  }
+
+  startConnector (uplinkData) {
+    return Connector.createApp({
+      spread: 0,
+      backend: 'one-to-one',
+      store: 'ilp-store-memory',
+      initialConnectTimeout: 60000,
+      env: this.environment,
+      adminApi: !!this.adminApiPort,
+      adminApiPort: this.adminApiPort,
+      accounts: {
+        parent: uplinkData,
+        local: {
+          relation: 'child',
+          plugin: 'ilp-plugin-mini-accounts',
+          assetCode: 'XRP',
+          assetScale: 6,
+          balance: {
+            minimum: '-Infinity',
+            maximum: 'Infinity',
+            settleThreshold: '-Infinity'
+          },
+          options: {
+            wsOpts: { host: 'localhost', port: 7768 },
+            allowedOrigins: this.allowedOrigins
+          }
+        }
       }
-    }
+    }).listen()
   }
-}).listen()
 
-exports.startLocal = (config, allowedOrigins) => Connector.createApp({
-  spread: 0,
-  backend: 'one-to-one',
-  store: 'ilp-store-memory',
-  adminApi: !!config.adminApiPort,
-  adminApiPort: config.adminApiPort,
-  initialConnectTimeout: 60000,
-  ilpAddress: 'private.moneyd',
-  accounts: {
-    local: {
-      relation: 'child',
-      plugin: 'ilp-plugin-mini-accounts',
-      assetCode: 'XRP',
-      assetScale: 6,
-      balance: {
-        minimum: '-Infinity',
-        maximum: 'Infinity',
-        settleThreshold: '-Infinity'
-      },
-      options: {
-        wsOpts: {
-          host: 'localhost',
-          port: 7768
-        },
-        allowedOrigins
+  startLocal () {
+    return Connector.createApp({
+      spread: 0,
+      backend: 'one-to-one',
+      store: 'ilp-store-memory',
+      initialConnectTimeout: 60000,
+      ilpAddress: 'private.moneyd',
+      env: this.environment,
+      adminApi: !!this.adminApiPort,
+      adminApiPort: this.adminApiPort,
+      accounts: {
+        local: {
+          relation: 'child',
+          plugin: 'ilp-plugin-mini-accounts',
+          assetCode: 'XRP',
+          assetScale: 6,
+          balance: {
+            minimum: '-Infinity',
+            maximum: 'Infinity',
+            settleThreshold: '-Infinity'
+          },
+          options: {
+            wsOpts: { host: 'localhost', port: 7768 },
+            allowedOrigins: this.allowedOrigins
+          }
+        }
       }
-    }
+    }).listen()
   }
-}).listen()
-
-function formatChannelExpiration (exp) {
-  if (!exp) return ''
-  const unixExp = (exp + 0x386D4380) * 1000
-  if (unixExp <= Date.now()) return chalk.blue('ready to close')
-  return chalk.yellow('in ' + moment.duration(unixExp - Date.now()).humanize())
 }
 
-function formatChannelToRow (c, i) {
-  return [
-    String(i),
-    c.destination_account,
-    c.amount,
-    c.balance,
-    formatChannelExpiration(c.expiration)
-  ]
-}
-
-exports.info = async (config) => {
-  console.log('connecting to xrp ledger...')
-  const api = await config.rippleApi()
-  console.log('getting account...')
-  const res = await api.getAccountInfo(config.xrpAddress)
-  console.log(chalk.green('balance: '), res.xrpBalance + ' XRP')
-  console.log(chalk.green('account: '), config.xrpAddress)
-
-  const channels = await api.connection.request({
-    command: 'account_channels',
-    account: config.xrpAddress
-  })
-
-  const formatted = table([
-    [ chalk.green('index'),
-      chalk.green('destination'),
-      chalk.green('amount (drops)'),
-      chalk.green('balance (drops)'),
-      chalk.green('expiry') ],
-    ...channels.channels.map(formatChannelToRow)
-  ])
-  console.log(formatted)
-}
-
-exports.cleanup = async (config) => {
-  await exports.info(config)
-  const api = await config.rippleApi()
-  const submitter = await config.submitter()
-
-  console.log('fetching channels...')
-  const channels = await api.connection.request({
-    command: 'account_channels',
-    account: config.xrpAddress
-  })
-
-  const result = await inquirer.prompt({
-    type: 'checkbox',
-    name: 'marked',
-    message: 'which of these channels would you like to close?',
-    choices: channels.channels.map((c, i) => {
-      return String(i)
-    })
-  })
-
-  for (const index of result.marked) {
-    console.log('closing', index + '...')
-    try {
-      await submitter.submit('preparePaymentChannelClaim', {
-        channel: channels.channels[index].channel_id,
-        close: true
-      })
-    } catch (e) {
-      console.error('Warning:', e.message)
-    }
+function getUplink (uplinkName) {
+  const uplink = uplinks[uplinkName]
+  if (uplink) return uplink
+  if (uplink === null) {
+    console.error('Missing required plugin. To install, run:')
+    console.error('')
+    console.error('  $ npm install -g ' + module)
+    console.error('')
+    console.error('assuming moneyd was also installed globally.')
+    process.exit(1)
   }
-
-  console.log('closed!')
-  process.exit(0)
+  if (uplink === undefined) {
+    console.error('Unknown uplink: "' + uplinkName + '"')
+    process.exit(1)
+  }
 }
+
+Moneyd.uplinks = uplinks
+module.exports = Moneyd

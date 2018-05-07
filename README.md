@@ -6,6 +6,7 @@
   - [Live Network](#live-network)
   - [Local Test Network](#local-test-network)
 - [Description](#description)
+- [Uplinks](#uplinks)
 - [Writing ILP Applications](#writing-ilp-applications)
   - [Making an SPSP Payment](#making-an-spsp-payment)
   - [How Does "ilp-plugin" Work?](#how-does-ilp-plugin-work)
@@ -33,9 +34,9 @@ You'll need:
 - Permissions to install global node modules.
 
 ```sh
-npm install -g moneyd
-moneyd configure --testnet
-moneyd start --testnet
+npm install -g moneyd moneyd-uplink-xrp
+moneyd --testnet xrp:configure
+moneyd --testnet xrp:start
 ```
 
 Give it a minute to initialize a channel, then you're done! A configuration
@@ -56,9 +57,9 @@ You'll need:
 Just run:
 
 ```sh
-npm install -g moneyd
-moneyd configure --secret YOUR_XRP_SECRET
-moneyd start
+npm install -g moneyd moneyd-uplink-xrp
+moneyd xrp:configure
+moneyd xrp:start
 ```
 
 Your XRP secret (or "seed") is the base58-encoded string that starts with an 's'.
@@ -100,6 +101,15 @@ other tools will work right out of the box.
 
 Because it's in early stages, don't use it
 with a ripple account that has too much money.
+
+## Uplinks
+
+An uplink module wraps ILP plugins for Moneyd's use. They provide additional features such as payment channel management and configuration construction. At least one uplink must be installed to use Moneyd.
+
+Example uplink modules:
+
+  * [moneyd-uplink-xrp](https://github.com/interledgerjs/moneyd-uplink-xrp)
+  * (more to come)
 
 ## Writing ILP Applications
 
@@ -175,7 +185,7 @@ moneyd help
 If you want to see the options for a specific command, pass `--help`. For example:
 
 ```
-moneyd configure --help
+moneyd xrp:configure --help
 ```
 
 ### Remote Deploy
@@ -202,7 +212,7 @@ you owe it money, and refusing to forward any of your packets.
 To fix this, just stop moneyd and run:
 
 ```
-moneyd topup --amount 1000
+moneyd xrp:topup --amount 1000
 ```
 
 You can adjust the amount if you need to reconcile more. The amount is
@@ -215,7 +225,7 @@ You can get information about your XRP account's balance and outstanding
 payment channels. To access this information, run:
 
 ```
-moneyd info
+moneyd xrp:info
 ```
 
 ### Clean Up Channels
@@ -230,11 +240,11 @@ close transaction to get your funds back and delete the channel.
 To mark channels for closing, run:
 
 ```
-moneyd cleanup
+moneyd xrp:cleanup
 ```
 
 Select the channels you'd like to close with `<space>` and then hit `<enter>`.
-If you run `moneyd info` you'll see that the channels now have expiries set.
+If you run `moneyd xrp:info` you'll see that the channels now have expiries set.
 
 Expect it to take an hour for the channel to be ready for closing; this gives
 the counterparty a chance to submit their best claim.
@@ -242,7 +252,7 @@ the counterparty a chance to submit their best claim.
 Once the hour is up, run cleanup again:
 
 ```
-moneyd cleanup
+moneyd xrp:cleanup
 ```
 
 This time, the channels should say `ready to close`. Mark them for closing, and
@@ -257,16 +267,28 @@ automatically open a fresh channel.
 Sometimes you want to run several instances of moneyd with for the same XRP
 account and parent connector.
 
-In order to distinguish your instances of moneyd, set (or change) the `"name"`
+In order to distinguish your instances of moneyd, set (or change) the `"uplinks.xrp.options.name"`
 field in your `~/.moneyd.json`. This `"name"` will be a segment of your ILP
 address, so it must only use `[A-Za-z0-9\-_~]`. The `"name"` must be unique per
 parent BTP host.
 
-```json
+```javascript
 {
-  "secret": "your_xrp_secret",
-  "parent": "your_parent_host",
-  "name": "example-user"
+  "version": 1,
+  "currentUplink": "xrp",
+  "uplinks": {
+    "xrp": {
+      // ...
+      "options": {
+        "server": "your_parent_host",
+        "secret": "your_xrp_secret",
+        "address": "your_xrp_address",
+        "xrpServer": "your_xrp_server",
+        "name": "example-user"
+      }
+    }
+    // ...
+  }
 }
 ```
 
