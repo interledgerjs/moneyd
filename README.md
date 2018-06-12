@@ -259,38 +259,30 @@ This time, the channels should say `ready to close`. Mark them for closing, and
 this time they'll go away for good. Your XRP account will be credited the total channel
 capacity minus the current channel balance.
 
-If you start moneyd and its previous channel is closing or closed, it will
-automatically open a fresh channel.
+If you start moneyd and its previous channel is closing or closed, you need to
+set a new `name` to force a new channel to be opened. Follow the instructions
+on [Multiple Instances](#multiple-instances) to accomplish this.
 
 ## Multiple Instances
 
 Sometimes you want to run several instances of moneyd with for the same XRP
 account and parent connector.
 
-In order to distinguish your instances of moneyd, set (or change) the `"uplinks.xrp.options.name"`
-field in your `~/.moneyd.json`. This `"name"` will be a segment of your ILP
-address, so it must only use `[A-Za-z0-9\-_~]`. The `"name"` must be unique per
-parent BTP host.
+In order to distinguish your instances of moneyd, set a unique `"name"` when you
+configure your uplink. This `"name"` will be a segment of your ILP address, so
+it must only use `[A-Za-z0-9\-_~]`. The `"name"` must be unique per parent BTP
+host.
 
-```javascript
-{
-  "version": 1,
-  "currentUplink": "xrp",
-  "uplinks": {
-    "xrp": {
-      // ...
-      "options": {
-        "server": "your_parent_host",
-        "secret": "your_xrp_secret",
-        "address": "your_xrp_address",
-        "xrpServer": "your_xrp_server",
-        "name": "example-user"
-      }
-    }
-    // ...
-  }
-}
+You'll have to configure in advanced mode to prompt for the name. Don't forget
+to back up your old `~/.moneyd.json` first. Then run configure for the currency
+you're using. For example, with XRP, run:
+
 ```
+moneyd xrp:configure --advanced
+```
+
+And then when you're prompted for `"name"`, put in the unique name that you want.
+This will force a fresh channel to be opened.
 
 You can use as many different `"name"`s as you want. If you run out of XRP from
 opening up channels, just follow [Clean Up Channels](#clean-up-channels) to
