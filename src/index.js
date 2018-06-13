@@ -7,6 +7,12 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'chrome-extension://fakjpmebfmpdbhpnddiokemempckoejk'
 ]
 
+const uplinkModuleNames = {
+  xrp: 'moneyd-uplink-xrp'
+  // eth: 'moneyd-uplink-eth',
+  // btp: 'moneyd-uplink-btp'
+}
+
 const uplinks = {
   xrp: maybeRequire('moneyd-uplink-xrp')
   // eth: maybeRequire('moneyd-uplink-eth'),
@@ -56,8 +62,8 @@ class Moneyd {
         local: {
           relation: 'child',
           plugin: 'ilp-plugin-mini-accounts',
-          assetCode: 'XRP',
-          assetScale: 6,
+          assetCode: uplinkData.assetCode,
+          assetScale: uplinkData.assetScale,
           balance: {
             minimum: '-Infinity',
             maximum: 'Infinity',
@@ -109,7 +115,7 @@ function getUplink (uplinkName) {
   if (uplink === null) {
     console.error('Missing required plugin. To install, run:')
     console.error('')
-    console.error('  $ npm install -g ' + module)
+    console.error('  $ npm install -g ' + uplinkModuleNames[uplinkName])
     console.error('')
     console.error('assuming moneyd was also installed globally.')
     process.exit(1)
