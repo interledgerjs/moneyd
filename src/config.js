@@ -10,7 +10,7 @@ class Config {
       this.data = JSON.parse(fs.readFileSync(file).toString())
 
       const stats = fs.statSync(file)
-      if (stats.mode & parseInt('077', 8)) {
+      if (stats.mode & 0o77) {
         console.warn(`${file} has loose permissions,` +
           ` and could be read by other users on this system.` +
           ` It is recommended that you use a mode of 600.` +
@@ -33,7 +33,7 @@ class Config {
   setUplinkData (uplink, uplinkData) {
     this.data.uplinks[uplink] = uplinkData
     fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2), {
-      mode: parseInt('0600', 8)
+      mode: 0o600
     })
   }
 }
