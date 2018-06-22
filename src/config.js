@@ -21,7 +21,9 @@ class Config {
 
   setUplinkData (uplink, uplinkData) {
     this.data.uplinks[uplink] = uplinkData
-    fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2))
+    fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2), {
+      mode: parseInt('0600', 8)
+    })
   }
 }
 
