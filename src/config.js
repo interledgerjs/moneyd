@@ -5,9 +5,20 @@ const crypto = require('crypto')
 class Config {
   constructor (file) {
     this.file = file
-    this.data = fs.existsSync(file)
-      ? JSON.parse(fs.readFileSync(file).toString())
-      : { version: 1, uplinks: {} }
+
+    if (fs.existsSync(file)) {
+      this.data = JSON.parse(fs.readFileSync(file).toString())
+
+      const stats = fs.statSync(file)
+      if (stats.mode & parseInt('077', 8)) {
+        console.warn(`${file} has loose permissions,` +
+          ` and could be read by other users on this system.` +
+          ` It is recommended that you use a mode of 600.` +
+          ` To do this, run \`chmod 600 ${file}\``)
+      }
+    } else {
+      this.data = { version: 1, uplinks: {} }
+    }
 
     // Deprecated config format: assume XRP.
     if (this.data.version === undefined) {
