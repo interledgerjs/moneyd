@@ -54,6 +54,12 @@ Object.keys(Moneyd.uplinks).forEach((uplinkName) => {
     command: uplinkName + ':configure',
     describe: 'Generate a configuration file',
     builder: {
+      force: {
+        type: 'boolean',
+        alias: 'f',
+        default: false,
+        description: 'Set to overwrite existing configuration'
+      },
       advanced: {
         type: 'boolean',
         default: false,

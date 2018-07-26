@@ -40,7 +40,7 @@ class Moneyd {
 
   static async buildConfig (uplinkName, argv) {
     const config = new Config(argv.config)
-    if (config.getUplinkData(uplinkName)) {
+    if (config.getUplinkData(uplinkName) && !argv.force) {
       throw new Error('config already exists for uplinkName=' + uplinkName + ' file=' + argv.config)
     }
 
