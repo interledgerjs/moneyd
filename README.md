@@ -331,3 +331,4 @@ find more use cases.
 
 - `client.scyl.la` - N. Virginia
 - `ilsp.openafricanetwork.org` - W. Europe (waiting for AWS to host instances in Africa...)
+- `ilp1.internetofvalue.xyz` - Nuremberg, Germany
