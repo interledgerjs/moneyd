@@ -331,3 +331,5 @@ find more use cases.
 
 - `client.scyl.la` - N. Virginia
 - `ilsp.openafricanetwork.org` - W. Europe (waiting for AWS to host instances in Africa...)
+- 'ilp.phobosnode.com'  -  Kansas City, MO  Central Midwest, USA
+- 'btp.phobosnode.com'  -  Kansas City, MO  Central Midwest, USA
