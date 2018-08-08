@@ -102,12 +102,9 @@ Object.keys(Moneyd.uplinks).forEach((uplinkName) => {
   })
 })
 
-// eslint-disable-next-line no-unused-expressions
 yargs
-  .command('*', '', {}, argv => {
-    console.error('unknown command.')
-    process.exit(1)
-  })
+  .demandCommand()
+  .strict()
   .argv
 
 function addUplinkCommand (uplinkName, cmd) {
