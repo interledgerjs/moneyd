@@ -21,10 +21,6 @@ jobs:
             - "node-v1-{{ .Branch }}-{{ checksum \"package-lock.json\" }}"
             - "node-v1-{{ .Branch }}-"
             - "node-v1-"
-
-      - run:
-          name: Install NPM
-          command: sudo npm install -g npm@latest
           
       - run:
           name: Install
@@ -32,7 +28,7 @@ jobs:
 
       - run:
           name: Install Greenkeeper-Lockfile
-          command: sudo npm install -g greenkeeper-lockfile
+          command: npm install -g greenkeeper-lockfile
 
       - run:
           name: Update Lockfile (Greenkeeper)
