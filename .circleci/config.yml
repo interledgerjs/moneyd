@@ -18,11 +18,14 @@ jobs:
       - restore_cache:
         keys: 
           # when lock file changes, use increasingly general patterns to restore cache
-          - node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
-          - node-v1-{{ .Branch }}-
-          - node-v1-
+          - "node-v1-{{ .Branch }}-{{ checksum \"package-lock.json\" }}"
+          - "node-v1-{{ .Branch }}-"
+          - "node-v1-"
 
-      - run: npm install
+      - run:
+          name: Install
+          command: npm install
+
       - run:
           name: Run tests
           command: npm test
