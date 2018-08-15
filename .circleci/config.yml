@@ -7,7 +7,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: circleci/node:8.9.1
+    - image: circleci/node:8.11.3
 
 jobs:
   test:
@@ -21,14 +21,26 @@ jobs:
             - "node-v1-{{ .Branch }}-{{ checksum \"package-lock.json\" }}"
             - "node-v1-{{ .Branch }}-"
             - "node-v1-"
-
+          
       - run:
           name: Install
           command: npm install
 
       - run:
+          name: Install Greenkeeper-Lockfile
+          command: sudo npm install -g greenkeeper-lockfile
+
+      - run:
+          name: Update Lockfile (Greenkeeper)
+          command: greenkeeper-lockfile-update
+
+      - run:
           name: Run tests
           command: npm test
+
+      - run:
+          name: Upload Lockfile (Greenkeeper)
+          command: greenkeeper-lockfile-upload
 
       - save_cache:
           paths:
