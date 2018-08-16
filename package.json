@@ -7,12 +7,16 @@
     "test": "echo \"Error: no test specified\"",
     "lint": "eslint ."
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ben Sharafian",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/interledgerjs/moneyd"
+  },
   "dependencies": {
     "chalk": "^2.3.0",
     "ilp-connector": "^22.1.0",
-    "ilp-plugin-mini-accounts": "^3.3.1",
+    "ilp-plugin-mini-accounts": "^3.5.1",
     "ilp-store-memory": "^1.0.0",
     "moment": "^2.22.1",
     "node-fetch": "^2.1.2",
