@@ -54,6 +54,12 @@ Object.keys(Moneyd.uplinks).forEach((uplinkName) => {
     command: uplinkName + ':configure',
     describe: 'Generate a configuration file',
     builder: {
+      force: {
+        type: 'boolean',
+        alias: 'f',
+        default: false,
+        description: 'Set to overwrite existing configuration'
+      },
       advanced: {
         type: 'boolean',
         default: false,
@@ -96,12 +102,9 @@ Object.keys(Moneyd.uplinks).forEach((uplinkName) => {
   })
 })
 
-// eslint-disable-next-line no-unused-expressions
 yargs
-  .command('*', '', {}, argv => {
-    console.error('unknown command.')
-    process.exit(1)
-  })
+  .demandCommand()
+  .strict()
   .argv
 
 function addUplinkCommand (uplinkName, cmd) {

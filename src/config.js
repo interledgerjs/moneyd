@@ -1,5 +1,6 @@
 'use strict'
 const fs = require('fs')
+const os = require('os')
 const crypto = require('crypto')
 
 class Config {
@@ -9,8 +10,9 @@ class Config {
     if (fs.existsSync(file)) {
       this.data = JSON.parse(fs.readFileSync(file).toString())
 
+      const osType = os.platform()
       const stats = fs.statSync(file)
-      if (stats.mode & 0o77) {
+      if (osType !== 'win32' && (stats.mode & 0o77)) {
         console.warn(`${file} has loose permissions,` +
           ` and could be read by other users on this system.` +
           ` It is recommended that you use a mode of 600.` +
