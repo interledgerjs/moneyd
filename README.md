@@ -1,4 +1,7 @@
 # Moneyd
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/interledgerjs/moneyd.svg)](https://greenkeeper.io/)
+
 > ILP-enable your machine!
 
 - [Quickstart](#quick-start)
