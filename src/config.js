@@ -2,6 +2,7 @@
 const fs = require('fs')
 const os = require('os')
 const crypto = require('crypto')
+const util = require('util')
 
 class Config {
   constructor (file) {
@@ -34,7 +35,7 @@ class Config {
 
   setUplinkData (uplink, uplinkData) {
     this.data.uplinks[uplink] = uplinkData
-    fs.writeFileSync(this.file, JSON.stringify(this.data, null, 2), {
+    fs.writeFileSync(this.file, util.inspect(this.data, null, 2), {
       mode: 0o600
     })
   }
