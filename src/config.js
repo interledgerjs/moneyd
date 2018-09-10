@@ -3,7 +3,6 @@ const fs = require('fs')
 const os = require('os')
 const crypto = require('crypto')
 const util = require('util')
-const JSON = require('circular-json')
 
 class Config {
   constructor (file) {
