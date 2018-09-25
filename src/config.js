@@ -59,6 +59,7 @@ function version0To1 (oldData) {
           settleTo: '10000000'
         },
         options: {
+          currencyScale: 9,
           server: parentUri,
           secret: oldData.secret,
           address: oldData.address,
