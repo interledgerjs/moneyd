@@ -51,15 +51,14 @@ function version0To1 (oldData) {
         relation: 'parent',
         plugin: 'moneyd-uplink-xrp/node_modules/ilp-plugin-xrp-asym-client',
         assetCode: 'XRP',
-        assetScale: 9,
+        assetScale: 6,
         balance: {
           minimum: '-Infinity',
-          maximum: '20000000',
-          settleThreshold: '5000000',
-          settleTo: '10000000'
+          maximum: '20000',
+          settleThreshold: '5000',
+          settleTo: '10000'
         },
         options: {
-          currencyScale: 9,
           server: parentUri,
           secret: oldData.secret,
           address: oldData.address,
