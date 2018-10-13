@@ -331,6 +331,6 @@ find more use cases.
 ## Connector List
 
 (Submit a PR to add your own connector here)
-- `g.value.work` - W. Europe (adding new public connector)
+- `ilp.value.work` - W. Europe (adding new public connector)
 - `client.scyl.la` - N. Virginia
 - `ilsp.openafricanetwork.org` - W. Europe (waiting for AWS to host instances in Africa...)
