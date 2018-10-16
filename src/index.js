@@ -93,7 +93,7 @@ class Moneyd {
           relation: 'child',
           plugin: 'ilp-plugin-mini-accounts',
           assetCode: 'XRP',
-          assetScale: 6,
+          assetScale: 9,
           balance: {
             minimum: '-Infinity',
             maximum: 'Infinity',
