@@ -2,7 +2,6 @@
 const fs = require('fs')
 const os = require('os')
 const crypto = require('crypto')
-const util = require('util')
 
 class Config {
   constructor (file) {
