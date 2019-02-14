@@ -10,14 +10,16 @@ const DEFAULT_ALLOWED_ORIGINS = [
 const uplinkModuleNames = {
   xrp: 'moneyd-uplink-xrp',
   eth: 'moneyd-uplink-eth',
-  coil: 'moneyd-uplink-coil'
+  coil: 'moneyd-uplink-coil',
+  http: 'moneyd-uplink-http'
   // btp: 'moneyd-uplink-btp'
 }
 
 const uplinks = {
   xrp: maybeRequire('moneyd-uplink-xrp'),
   eth: maybeRequire('moneyd-uplink-eth'),
-  coil: maybeRequire('moneyd-uplink-coil')
+  coil: maybeRequire('moneyd-uplink-coil'),
+  http: maybeRequire('moneyd-uplink-http')
   // btp: maybeRequire('moneyd-uplink-btp')
 }
 
