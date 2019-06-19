@@ -74,7 +74,10 @@ class Moneyd {
             settleThreshold: '-Infinity'
           },
           options: {
-            wsOpts: { host: 'localhost', port: 7768 },
+            wsOpts: {
+              host: process.env.MONEYD_BIND_IP || 'localhost',
+              port: 7768
+            },
             allowedOrigins: this.allowedOrigins
           }
         }
@@ -104,7 +107,10 @@ class Moneyd {
             settleThreshold: '-Infinity'
           },
           options: {
-            wsOpts: { host: 'localhost', port: 7768 },
+            wsOpts: {
+              host: process.env.MONEYD_BIND_IP || 'localhost',
+              port: 7768
+            },
             allowedOrigins: this.allowedOrigins
           }
         }

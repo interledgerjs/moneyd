@@ -13,8 +13,9 @@
 - [Writing ILP Applications](#writing-ilp-applications)
   - [Making an SPSP Payment](#making-an-spsp-payment)
   - [How Does "ilp-plugin" Work?](#how-does-ilp-plugin-work)
-- [Advanced Usage](#usage)
+- [Advanced Usage](#advanced-usage)
   - [Command-Line Options](#command-line-options)
+  - [Environment Variables](#environment-variables)
   - [Remote Deploy](#remote-deploy)
   - [Reconciliation](#reconciliation)
   - [Account Info](#account-info)
@@ -98,6 +99,7 @@ It works by creating a payment channel to an Interledger connector, and then
 running `ilp-plugin-mini-accounts` locally. Any plugin can connect to this
 mini-accounts instance by generating a random secret and authenticating via BTP
 to `localhost:7768`. By default, only connections from localhost are accepted.
+(See [Environment Variables](#environment-variables).)
 
 The `ilp-plugin` repo is already designed to do this, so `ilp-curl` and many
 other tools will work right out of the box.
@@ -190,6 +192,13 @@ If you want to see the options for a specific command, pass `--help`. For exampl
 ```
 moneyd xrp:configure --help
 ```
+
+### Environment Variables
+
+You can customize the behavior of `moneyd` using [environment
+variables](https://en.wikipedia.org/wiki/Environment_variable#Unix).
+
+- `MONEYD_BIND_IP` - A string specifying the IP address on which the moneyd websocket server listens. Default: `localhost`.
 
 ### Remote Deploy
 
