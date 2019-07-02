@@ -105,7 +105,7 @@ Object.keys(Moneyd.uplinks).forEach((uplinkName) => {
 yargs
   .demandCommand()
   .strict()
-  .argv
+  .parse()
 
 function addUplinkCommand (uplinkName, cmd) {
   yargs.command({
