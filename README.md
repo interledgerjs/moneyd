@@ -8,6 +8,7 @@
   - [Test Network](#test-network)
   - [Live Network](#live-network)
   - [Local Test Network](#local-test-network)
+  - [Cloud Test Network](#cloud-test-network)
 - [Description](#description)
 - [Uplinks](#uplinks)
 - [Writing ILP Applications](#writing-ilp-applications)
@@ -90,13 +91,14 @@ moneyd local
 This exposes ILP access via port 7768, but any application connected to this
 port will only be able to pay other applications on the same machine.
 
-### Deploying to Heroku
+### Cloud Test Network
 
-The button below will deploy an instance of moneyd running in local mode to Heroku.
+A publically accessible test network can be created by deploying moneyd to Heroku. Use the button below to deploy
+an instance of moneyd running in local mode.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-Once deployed, Heroku will provide you with a url to connect to your cloud moneyd e.g. moneyd.herokuapp.com
+Once deployed, Heroku will provide you with a url to connect to your cloud moneyd which has the form heroku-app-name.herokuapp.com
 
 A local moneyd instance can then be set up to connect to the Heroku instance using the following commands: 
 
@@ -104,13 +106,12 @@ A local moneyd instance can then be set up to connect to the Heroku instance usi
 moneyd --testnet btp:configure
 ```
 
-Follow the command-line prompts to configure the connection. When prompted for the `BTP host of parent connector`, enter the url provided by Heroku. Once the uplink has been configured, run the local moneyd instance 
+Follow the command-line prompts to configure the connection. When prompted for the `BTP host of parent connector`, enter the url provided by Heroku (heroku-app-name.herokuapp.com without the https://).
+Once the uplink has been configured, run the local moneyd instance 
 
 ```sh
 moneyd --testnet btp:start
 ```
-
-#### Connecting to the Heroku instance
 
 ## Description
 
@@ -146,7 +147,7 @@ moneyd btp:configure
 moneyd btp:start
 ```
 
-(See [Deploying to Heroku](#Deploying-to-Heroku) for example.)
+(See [Cloud Test Netwrok](#cloud-test-network) for example.)
 
 ## Writing ILP Applications
 
