@@ -11,16 +11,16 @@ const uplinkModuleNames = {
   xrp: 'moneyd-uplink-xrp',
   eth: 'moneyd-uplink-eth',
   coil: 'moneyd-uplink-coil',
-  http: 'moneyd-uplink-http'
-  // btp: 'moneyd-uplink-btp'
+  http: 'moneyd-uplink-http',
+  btp: 'moneyd-uplink-btp'
 }
 
 const uplinks = {
   xrp: maybeRequire('moneyd-uplink-xrp'),
   eth: maybeRequire('moneyd-uplink-eth'),
   coil: maybeRequire('moneyd-uplink-coil'),
-  http: maybeRequire('moneyd-uplink-http')
-  // btp: maybeRequire('moneyd-uplink-btp')
+  http: maybeRequire('moneyd-uplink-http'),
+  btp: maybeRequire('moneyd-uplink-btp')
 }
 
 function maybeRequire (pkg) {
@@ -76,7 +76,7 @@ class Moneyd {
           options: {
             wsOpts: {
               host: process.env.MONEYD_BIND_IP || 'localhost',
-              port: 7768
+              port: process.env.MONEYD_BIND_PORT || 7768
             },
             allowedOrigins: this.allowedOrigins
           }
@@ -99,8 +99,8 @@ class Moneyd {
         local: {
           relation: 'child',
           plugin: 'ilp-plugin-mini-accounts',
-          assetCode: 'XRP',
-          assetScale: 9,
+          assetCode: process.env.MONEYD_BIND_ASSET_CODE || 'XRP',
+          assetScale: process.env.MONEYD_BIND_ASSET_SCALE || 9,
           balance: {
             minimum: '-Infinity',
             maximum: 'Infinity',
@@ -109,7 +109,7 @@ class Moneyd {
           options: {
             wsOpts: {
               host: process.env.MONEYD_BIND_IP || 'localhost',
-              port: 7768
+              port: process.env.MONEYD_BIND_PORT || 7768
             },
             allowedOrigins: this.allowedOrigins
           }
