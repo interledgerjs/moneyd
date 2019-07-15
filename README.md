@@ -140,14 +140,14 @@ Example uplink modules:
   * (more to come)
 
 ### moneyd-uplink-btp
-This uplink comes packaged with moneyd by default. It is used to create a data only link (no settlement) to a parent connector instance that accepts connections using `ilp-plugin-mini-accounts`. The following commands are used to configure and run moneyd using the moneyd-uplink-btp:
+This uplink comes packaged with moneyd by default. It is used to create a data only link (no settlement) to a parent connector instance that accepts connections using `ilp-plugin-mini-accounts` (such as another moneyd). The following commands are used to configure and run moneyd using the moneyd-uplink-btp:
 
 ```sh
 moneyd btp:configure
 moneyd btp:start
 ```
 
-(See [Cloud Test Netwrok](#cloud-test-network) for example.)
+(See [Cloud Test Network](#cloud-test-network) for example.)
 
 ## Writing ILP Applications
 
