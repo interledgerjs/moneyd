@@ -1,11 +1,11 @@
 'use strict'
 
-const { randomBytes, createHmac } = require('crypto')
+const { randomBytes } = require('crypto')
 const inquirer = require('inquirer')
-const connectorList =  [
-  "za1.rafikilabs.com/btp",
-  "eu1.rafikilabs.com/btp",
-  "us1.rafikilabs.com/btp"
+const connectorList = [
+  'za1.rafikilabs.com/btp',
+  'eu1.rafikilabs.com/btp',
+  'us1.rafikilabs.com/btp'
 ]
 
 const base64url = buf => buf
@@ -60,11 +60,6 @@ async function configure ({ testnet, advanced }) {
     }
   }
 }
-
-const hmac = (key, message) =>
-  createHmac('sha256', key)
-    .update(message)
-    .digest()
 
 module.exports = {
   configure,
