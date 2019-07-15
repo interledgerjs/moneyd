@@ -27,7 +27,6 @@ function maybeRequire (pkg) {
   try {
     return require(pkg)
   } catch (err) {
-    console.log('err', err)
     if (err.code !== 'MODULE_NOT_FOUND') throw err
     return null
   }
