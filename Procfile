@@ -1,0 +1,1 @@
+web: MONEYD_BIND_PORT=$PORT node ./bin/moneyd.js local

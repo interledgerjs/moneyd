@@ -20,13 +20,14 @@ const uplinks = {
   eth: maybeRequire('moneyd-uplink-eth'),
   coil: maybeRequire('moneyd-uplink-coil'),
   http: maybeRequire('moneyd-uplink-http'),
-  btp: maybeRequire('moneyd-uplink-btp')
+  btp: maybeRequire('./moneyd-uplink-btp')
 }
 
 function maybeRequire (pkg) {
   try {
     return require(pkg)
   } catch (err) {
+    console.log('err', err)
     if (err.code !== 'MODULE_NOT_FOUND') throw err
     return null
   }

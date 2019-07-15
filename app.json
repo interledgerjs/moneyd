@@ -3,8 +3,5 @@
   "description": "A barebones Interledger connector",
   "repository": "https://github.com/adrianhopebailie/moneyd",
   "logo": "https://github.com/interledgerjs/ilp/raw/master/ilp_logo.png",
-  "keywords": ["interledger", "moneyd"],
-  "scripts": {
-    "start": "MONEYD_BIND_PORT=$PORT node ./bin/moneyd.js local"
-  }
+  "keywords": ["interledger", "moneyd"]
 }
