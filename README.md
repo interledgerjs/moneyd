@@ -8,6 +8,7 @@
   - [Test Network](#test-network)
   - [Live Network](#live-network)
   - [Local Test Network](#local-test-network)
+  - [Cloud Test Network](#cloud-test-network)
 - [Description](#description)
 - [Uplinks](#uplinks)
 - [Writing ILP Applications](#writing-ilp-applications)
@@ -90,6 +91,28 @@ moneyd local
 This exposes ILP access via port 7768, but any application connected to this
 port will only be able to pay other applications on the same machine.
 
+### Cloud Test Network
+
+A publically accessible test network can be created by deploying moneyd to Heroku. Use the button below to deploy
+an instance of moneyd running in local mode.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+Once deployed, Heroku will provide you with a url to connect to your cloud moneyd which has the form heroku-app-name.herokuapp.com
+
+A local moneyd instance can then be set up to connect to the Heroku instance using the following commands: 
+
+```sh
+moneyd --testnet btp:configure
+```
+
+Follow the command-line prompts to configure the connection. When prompted for the `BTP host of parent connector`, enter the url provided by Heroku (heroku-app-name.herokuapp.com without the https://).
+Once the uplink has been configured, run the local moneyd instance 
+
+```sh
+moneyd --testnet btp:start
+```
+
 ## Description
 
 This repo contains an experimental ILP provider, allowing all applications on
@@ -115,6 +138,16 @@ Example uplink modules:
 
   * [moneyd-uplink-xrp](https://github.com/interledgerjs/moneyd-uplink-xrp)
   * (more to come)
+
+### moneyd-uplink-btp
+This uplink comes packaged with moneyd by default. It is used to create a data only link (no settlement) to a parent connector instance that accepts connections using `ilp-plugin-mini-accounts` (such as another moneyd). The following commands are used to configure and run moneyd using the moneyd-uplink-btp:
+
+```sh
+moneyd btp:configure
+moneyd btp:start
+```
+
+(See [Cloud Test Network](#cloud-test-network) for example.)
 
 ## Writing ILP Applications
 
@@ -199,7 +232,10 @@ You can customize the behavior of `moneyd` using [environment
 variables](https://en.wikipedia.org/wiki/Environment_variable#Unix).
 
 - `MONEYD_BIND_IP` - A string specifying the IP address on which the moneyd websocket server listens. Default: `localhost`.
-
+- `MONEYD_BIND_PORT` - A string specifying the PORT on which the moneyd websocket server listens. Default: `7768`.
+- `MONEYD_ASSET_CODE` - A string specifying the ASSET CODE that moneyd is configured with when running in LOCAL mode. Default: `XRP`.
+- `MONEYD_ASSET_SCALE` - A number specifying the ASSET SCALE that moneyd is configured with when running in LOCAL mode. Default: `9`.
+- `MONEYD_ILP_ADDRESS` - A string specifying the ilp address that moneyd is configured with when running in LOCAL mode. Default: `private.moneyd`.
 ### Remote Deploy
 
 If you did the previous step on your remote server, then you don't need to run any

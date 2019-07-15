@@ -1,0 +1,7 @@
+{
+  "name": "moneyd",
+  "description": "A barebones Interledger connector",
+  "repository": "https://github.com/interledgerjs/moneyd",
+  "logo": "https://github.com/interledgerjs/ilp/raw/master/ilp_logo.png",
+  "keywords": ["interledger", "moneyd"]
+}
