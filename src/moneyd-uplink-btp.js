@@ -37,7 +37,7 @@ async function configure ({ testnet, advanced }) {
     type: 'input',
     name: 'assetScale',
     message: 'Currency scale to use to connect to parent:',
-    default: '6'
+    default: '9'
   }]
 
   for (const field of fields) {
