@@ -200,8 +200,9 @@ variables](https://en.wikipedia.org/wiki/Environment_variable#Unix).
 
 - `MONEYD_BIND_IP` - A string specifying the IP address on which the moneyd websocket server listens. Default: `localhost`.
 - `MONEYD_BIND_PORT` - A string specifying the PORT on which the moneyd websocket server listens. Default: `7768`.
-- `MONEYD_BIND_ASSET_CODE` - A string specifying the ASSET CODE that moneyd is configured with when running in LOCAL mode. Default: `XRP`.
-- `MONEYD_BIND_ASSET_SCALE` - A number specifying the ASSET SCALE that moneyd is configured with when running in LOCAL mode. Default. Default: `9`.
+- `MONEYD_ASSET_CODE` - A string specifying the ASSET CODE that moneyd is configured with when running in LOCAL mode. Default: `XRP`.
+- `MONEYD_ASSET_SCALE` - A number specifying the ASSET SCALE that moneyd is configured with when running in LOCAL mode. Default. Default: `9`.
+- `MONEYD_ILP_ADDRESS` - A string specifying the ilp address that moneyd is configured with when running in LOCAL mode. Default. Default: `private.moneyd`.
 ### Remote Deploy
 
 If you did the previous step on your remote server, then you don't need to run any

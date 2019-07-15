@@ -91,7 +91,7 @@ class Moneyd {
       backend: 'one-to-one',
       store: 'ilp-store-memory',
       initialConnectTimeout: 60000,
-      ilpAddress: 'private.moneyd',
+      ilpAddress: process.env.MONEYD_ILP_ADDRESS || 'private.moneyd',
       env: this.environment,
       adminApi: !!this.adminApiPort,
       adminApiPort: this.adminApiPort,
@@ -99,8 +99,8 @@ class Moneyd {
         local: {
           relation: 'child',
           plugin: 'ilp-plugin-mini-accounts',
-          assetCode: process.env.MONEYD_BIND_ASSET_CODE || 'XRP',
-          assetScale: process.env.MONEYD_BIND_ASSET_SCALE || 9,
+          assetCode: process.env.MONEYD_ASSET_CODE || 'XRP',
+          assetScale: process.env.MONEYD_ASSET_SCALE || 9,
           balance: {
             minimum: '-Infinity',
             maximum: 'Infinity',
