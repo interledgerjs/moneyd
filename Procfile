@@ -1,1 +1,1 @@
-web: MONEYD_BIND_PORT=$PORT node ./bin/moneyd.js local
+web: MONEYD_BIND_PORT=$PORT MONEYD_BIND_IP=0.0.0.0 node ./bin/moneyd.js local
