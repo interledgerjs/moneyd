@@ -6,12 +6,12 @@
   "keywords": ["interledger", "moneyd"],
   "env": {
     "SET_ASSET_CODE": {
-            "description": "What asset code do you want to use?",
-            "value": ""
+        "description": "What asset code do you want to use?",
+        "value": ""
     },
     "SET_ASSET_SCALE": {
-            "description": "What asset scale do you want to use?",
-            "value": ""
+        "description": "What asset scale do you want to use?",
+        "value": ""
     },
   }
 }
