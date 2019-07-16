@@ -12,6 +12,6 @@
     "SET_ASSET_SCALE": {
         "description": "What asset scale do you want to use?",
         "value": ""
-    },
+    }
   }
 }
