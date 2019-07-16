@@ -3,5 +3,24 @@
   "description": "A barebones Interledger connector",
   "repository": "https://github.com/interledgerjs/moneyd",
   "logo": "https://github.com/interledgerjs/ilp/raw/master/ilp_logo.png",
-  "keywords": ["interledger", "moneyd"]
+  "keywords": ["interledger", "moneyd"],
+  "addons": ["heroku-postgresql:hobby-dev", "papertrail"],
+  "env": {
+    "RAILS_ENV": "production",
+    "COOKIE_SECRET": {
+            "description": "This gets generated",
+            "generator": "secret"
+    },
+    "SET_ASSET_CODE": {
+            "description": "What asset code do you want to use?",
+            "value": ""
+    },
+    "SET_ASSET_SCALE": {
+            "description": "What asset scale do you want to use?",
+            "value": ""
+    }
+  },
+  "scripts": {
+    "postdeploy": "bundle exec rake db:migrate"
+  }
 }
