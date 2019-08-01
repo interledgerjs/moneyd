@@ -238,7 +238,6 @@ variables](https://en.wikipedia.org/wiki/Environment_variable#Unix).
 - `MONEYD_ILP_ADDRESS` - A string specifying the ilp address that moneyd is configured with when running in LOCAL mode. Default: `private.moneyd`.
 - `SET_ASSET_CODE` - A string specifying which Moneyd asset code to use
 - `SET_ASSET_SCALE` - A number specifying the Moneyd asset scale to be configured with
-- `SET_PORT` - A string specifying which port to listen to
 ### Remote Deploy
 
 If you did the previous step on your remote server, then you don't need to run any
