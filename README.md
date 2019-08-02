@@ -29,7 +29,7 @@
 
 If you already have an XRP account with 35 XRP or more, use the [Livenet](#live-network) instructions.
 Otherwise, you can still follow the [Testnet](#test-network) instructions. For development in an offline
-environment, you can run your own [Local Testnet](#local-test-network). 
+environment, you can run your own [Local Testnet](#local-test-network).
 
 ### Test Network
 
@@ -94,20 +94,20 @@ port will only be able to pay other applications on the same machine.
 ### Cloud Test Network
 
 A publically accessible test network can be created by deploying moneyd to Heroku. Use the button below to deploy
-an instance of moneyd running in local mode.
+an instance of moneyd running in local mode. Prior to completing the app deployment, Heroku will ask for two required fields: Setting the asset code (i.e, XRP, USD) and setting the asset scale.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 Once deployed, Heroku will provide you with a url to connect to your cloud moneyd which has the form heroku-app-name.herokuapp.com
 
-A local moneyd instance can then be set up to connect to the Heroku instance using the following commands: 
+A local moneyd instance can then be set up to connect to the Heroku instance using the following commands:
 
 ```sh
 moneyd --testnet btp:configure
 ```
 
 Follow the command-line prompts to configure the connection. When prompted for the `BTP host of parent connector`, enter the url provided by Heroku (heroku-app-name.herokuapp.com without the https://).
-Once the uplink has been configured, run the local moneyd instance 
+Once the uplink has been configured, run the local moneyd instance
 
 ```sh
 moneyd --testnet btp:start
@@ -236,6 +236,8 @@ variables](https://en.wikipedia.org/wiki/Environment_variable#Unix).
 - `MONEYD_ASSET_CODE` - A string specifying the ASSET CODE that moneyd is configured with when running in LOCAL mode. Default: `XRP`.
 - `MONEYD_ASSET_SCALE` - A number specifying the ASSET SCALE that moneyd is configured with when running in LOCAL mode. Default: `9`.
 - `MONEYD_ILP_ADDRESS` - A string specifying the ilp address that moneyd is configured with when running in LOCAL mode. Default: `private.moneyd`.
+- `SET_ASSET_CODE` - A string specifying which Moneyd asset code to use
+- `SET_ASSET_SCALE` - A number specifying the Moneyd asset scale to be configured with
 ### Remote Deploy
 
 If you did the previous step on your remote server, then you don't need to run any

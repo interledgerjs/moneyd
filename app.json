@@ -3,5 +3,15 @@
   "description": "A barebones Interledger connector",
   "repository": "https://github.com/interledgerjs/moneyd",
   "logo": "https://github.com/interledgerjs/ilp/raw/master/ilp_logo.png",
-  "keywords": ["interledger", "moneyd"]
+  "keywords": ["interledger", "moneyd"],
+  "env": {
+    "SET_ASSET_CODE": {
+        "description": "What asset code do you want to use?",
+        "value": ""
+    },
+    "SET_ASSET_SCALE": {
+        "description": "What asset scale do you want to use?",
+        "value": ""
+    }
+  }
 }
