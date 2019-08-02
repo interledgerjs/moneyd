@@ -94,7 +94,7 @@ port will only be able to pay other applications on the same machine.
 ### Cloud Test Network
 
 A publically accessible test network can be created by deploying moneyd to Heroku. Use the button below to deploy
-an instance of moneyd running in local mode. Prior to completing the app deployment, Heroku will ask for three required fields: Setting the asset code (i.e, XRP, USD), setting the asset scale, and setting the listening port.
+an instance of moneyd running in local mode. Prior to completing the app deployment, Heroku will ask for two required fields: Setting the asset code (i.e, XRP, USD) and setting the asset scale.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 

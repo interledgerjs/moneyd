@@ -12,10 +12,6 @@
     "SET_ASSET_SCALE": {
         "description": "What asset scale do you want to use?",
         "value": ""
-    },
-    "SET_PORT": {
-      "description": "What port do you want to connect to?",
-      "value": ""
     }
   }
 }
