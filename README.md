@@ -4,15 +4,15 @@
 
 > ILP-enable your machine!
 
+- [Interledger Networks](#interledger-networks)
 - [Quickstart](#quick-start)
   - [Test Network](#test-network)
-  - [Live Network](#live-network)
+  - [Community Network](#community-network)
   - [Local Test Network](#local-test-network)
   - [Cloud Test Network](#cloud-test-network)
 - [Description](#description)
 - [Uplinks](#uplinks)
 - [Writing ILP Applications](#writing-ilp-applications)
-  - [Making an SPSP Payment](#making-an-spsp-payment)
   - [How Does "ilp-plugin" Work?](#how-does-ilp-plugin-work)
 - [Advanced Usage](#advanced-usage)
   - [Command-Line Options](#command-line-options)
@@ -25,9 +25,26 @@
 - [Sending Payments](#sending-payments)
 - [Connector List](#connector-list)
 
+## Interledger Networks
+
+When moneyd was created, the Interledger livenet was a community-run network for research and development
+purposes. Now there is a well-established Interledger livenet based around wallet providers such as
+[Gatehub](https://gatehub.net), [XRPTipBot](https://xrptipbot.com), and [Stronghold](https://stronghold.co/).
+
+Today's Interledger livenet makes it easy for anyone to get a payment pointer to receive Interledger payments, and
+has handled billions of micropayments. However, the wallets which now make up the livenet have not yet exposed
+moneyd-like direct Interleger access.
+
+As a result, moneyd will only run against a community network of connectors, not the Interledger livenet.
+It's still a useful tool for experimenting with Interledger, but it is not currently suitable for any production
+use cases.
+
 ## Quick Start
 
-If you already have an XRP account with 35 XRP or more, use the [Livenet](#live-network) instructions.
+If you haven't already, read the [Interledger Networks](#interledger-networks)
+section above. **Moneyd does not currently connect to the Interledger livenet.**
+
+If you already have an XRP account with 35 XRP or more, use the [community network](#community-network) instructions.
 Otherwise, you can still follow the [Testnet](#test-network) instructions. For development in an offline
 environment, you can run your own [Local Testnet](#local-test-network).
 
@@ -51,7 +68,7 @@ So long as that command is running, you'll have access to ILP via port 7768.
 To try it out, follow the [Sending Payments](#sending-payments) section, and
 use the alternate endpoints listed for the testnet.
 
-### Live Network
+### Community Network
 
 You'll need:
 
@@ -73,9 +90,10 @@ Give it a minute to initialize a channel, then you're done! A configuration
 file will be created in `~/.moneyd.json`.
 
 
-So long as that command is running, you'll have access to ILP via port 7768.
-For some commands you can do, look at [Sending Payments](#sending-payments).
-For more advanced usage of the moneyd command, look at [Advanced Usage](#advanced-usage).
+So long as that command is running, you'll have access to ILP's community
+network via port 7768.  For some commands you can do, look at [Sending
+Payments](#sending-payments).  For more advanced usage of the moneyd command,
+look at [Advanced Usage](#advanced-usage).
 
 ### Local Test Network
 
@@ -116,7 +134,7 @@ moneyd --testnet btp:start
 ## Description
 
 This repo contains an experimental ILP provider, allowing all applications on
-your computer to use funds on the _live_ ILP network.
+your computer to use funds on a community ILP network.
 
 It works by creating a payment channel to an Interledger connector, and then
 running `ilp-plugin-mini-accounts` locally. Any plugin can connect to this
@@ -164,33 +182,6 @@ This Interledger
 [Plugin](https://github.com/interledger/rfcs/blob/master/0024-ledger-plugin-interface-2/0024-ledger-plugin-interface-2.md)
 is a connection to your Moneyd instance. You can then pass it into other
 modules to send payments through your Moneyd.
-
-### Making an SPSP Payment
-
-The snippet of code below shows how to use `ilp-plugin` and
-[`ilp-protocol-spsp`](https://github.com/sharafian/ilp-protocol-spsp) to pay the identifier `$sharafian.com`. This identifier
-is only reachable on the livenet; If you want to send to somewhere on the
-testnet, use [SPSP server](https://github.com/sharafian/ilp-spsp-server) to
-create your own receiver.
-
-```
-const plugin = require('ilp-plugin')()
-const SPSP = require('ilp-protocol-spsp')
-
-async function run () {
-  console.log('paying $sharafian.com...')
-
-  // use '$spsp.ilp-test.com' if you're on the testnet
-  await SPSP.pay(plugin, {
-    receiver: '$sharafian.com',
-    sourceAmount: '10'
-  })
-
-  console.log('paid!')
-}
-
-run().catch(e => console.error(e))
-```
 
 ### How Does "ilp-plugin" Work?
 
