@@ -27,17 +27,15 @@
 
 ## Interledger Networks
 
-When moneyd was created, the Interledger livenet was a community-run network for research and development
-purposes. Now there is a well-established Interledger livenet based around wallet providers such as
-[Gatehub](https://gatehub.net), [XRPTipBot](https://xrptipbot.com), and [Stronghold](https://stronghold.co/).
+When moneyd was created, what we referred to as the _Interledger livenet_ was a community-run network for research and development
+purposes. Today there is a well-established Interledger network based around wallet providers such as
+[Gatehub](https://gatehub.net), [XRPTipBot](https://xrptipbot.com), and [Stronghold](https://stronghold.co/) which we call the Interledger livenet.
 
 Today's Interledger livenet makes it easy for anyone to get a payment pointer to receive Interledger payments, and
 has handled billions of micropayments. However, the wallets which now make up the livenet have not yet exposed
-moneyd-like direct Interleger access.
+moneyd-like direct Interledger access.
 
-As a result, moneyd will only run against a community network of connectors, not the Interledger livenet.
-It's still a useful tool for experimenting with Interledger, but it is not currently suitable for any production
-use cases.
+As a result, moneyd will only connect to a community network of connectors, not the Interledger livenet. The community network uses real money, but is not connected to Interledger-enabled wallets and businesses so we're not currently recommending it for production use-cases. However, Moneyd is still a useful tool for experimenting with Interledger for education and experimentation.
 
 ## Quick Start
 
