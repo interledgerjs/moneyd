@@ -50,7 +50,7 @@ environment, you can run your own [Local Testnet](#local-test-network).
 
 You'll need:
 
-- Node v8.9.4 or higher.
+- Node v10 or higher.
 - Permissions to install global node modules.
 
 ```sh
