@@ -1,3 +1,5 @@
+*Read this in other languages: [日本語](README-ja.md).*
+
 # Moneyd
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/interledgerjs/moneyd.svg)](https://greenkeeper.io/)
