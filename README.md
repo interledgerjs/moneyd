@@ -1,6 +1,7 @@
 # Moneyd
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/interledgerjs/moneyd.svg)](https://greenkeeper.io/)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Finterledgerjs%2Fmoneyd.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Finterledgerjs%2Fmoneyd?ref=badge_shield)
 
 > ILP-enable your machine!
 
@@ -370,3 +371,7 @@ find more use cases.
 
 - `client.scyl.la` - N. Virginia
 - `ilsp.openafricanetwork.org` - W. Europe (waiting for AWS to host instances in Africa...)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Finterledgerjs%2Fmoneyd.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Finterledgerjs%2Fmoneyd?ref=badge_large)
