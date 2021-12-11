@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "dev": "./bin/moneyd.js local"
   },
   "author": "Ben Sharafian",
   "license": "Apache-2.0",
