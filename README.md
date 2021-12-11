@@ -370,3 +370,4 @@ find more use cases.
 
 - `client.scyl.la` - N. Virginia
 - `ilsp.openafricanetwork.org` - W. Europe (waiting for AWS to host instances in Africa...)
+- 'ilsp1.phobosnode.com' - 'g.aurora' -  Kansas City, MO  Central Midwest, USA
