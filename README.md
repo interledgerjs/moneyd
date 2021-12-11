@@ -370,3 +370,6 @@ find more use cases.
 
 - `client.scyl.la` - N. Virginia
 - `ilsp.openafricanetwork.org` - W. Europe (waiting for AWS to host instances in Africa...)
+- `btp1.mlab.company` - W. Europe / Hosted on own infra as a PCI-DSS v3.2.1 compliant service (Gitter @WilcoC_gitlab)
+- `btp2.mlab.company` - W. Europe / Hosted on own infra as a PCI-DSS v3.2.1 compliant service (Gitter @WilcoC_gitlab)
+- `btp3.mlab.company` - W. Europe / Hosted on own infra as a PCI-DSS v3.2.1 compliant service (Gitter @WilcoC_gitlab)
